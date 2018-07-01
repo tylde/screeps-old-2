@@ -33,5 +33,13 @@ module.exports = {
     });
 
     if (creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) creep.moveTo(targets[0]);
+  },
+
+  constructStructures: creep => {
+    const constructions = creep.room.find(FIND_CONSTRUCTION_SITES);
+    if (constructions.length > 0) {
+      constructions.sort((a, b) => a.id < b.id);
+      if (creep.build(constructions[0]) == ERR_NOT_IN_RANGE) creep.moveTo(constructions[0])
+    }
   }
 }

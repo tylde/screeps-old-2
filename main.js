@@ -3,21 +3,25 @@ const spawningModule = require('./spawning.module');
 const harvesterRole = require('./role.harvester');
 const upgraderRole = require('role.upgrader');
 const minerRole = require('role.miner');
+const builderRole = require('role.builder');
 
 const HARVESTER_MAX_AMOUNT = 1;
 const UPGRADERS_MAX_AMOUNT = 6;
 const MINERS_MAX_AMOUNT = 4;
+const BUILDERS_MAX_AMOUNT = 1;
 
 
 const harvesters = _.filter(Game.creeps, creep => creep.memory.role === 'harvester');
 const upgraders = _.filter(Game.creeps, creep => creep.memory.role === 'upgrader');
-const miners = _.filter(Game.creeps, creep => creep.memory.role === 'miners');
+const miners = _.filter(Game.creeps, creep => creep.memory.role === 'miner');
+const builders = _.filter(Game.creeps, creep => creep.memory.role === 'builder');
 
 const containers = Game.rooms["W3N7"].find(FIND_STRUCTURES, { filter: structure => structure.structureType == STRUCTURE_CONTAINER });
 
 if (harvesters.length < HARVESTER_MAX_AMOUNT) spawningModule.createNewCreep('harvester');
 if (upgraders.length < UPGRADERS_MAX_AMOUNT) spawningModule.createNewCreep('upgrader');
-if (miners.length < UPGRADERS_MAX_AMOUNT && miners.length < containers.length) spawningModule.createNewCreep('miners');
+if (miners.length < MINERS_MAX_AMOUNT && miners.length < containers.length) spawningModule.createNewCreep('miner');
+if (builders.length < BUILDERS_MAX_AMOUNT) spawningModule.createNewCreep('builder');
 
 for (let name in Memory.creeps) {
   if (!Game.creeps[name]) {
@@ -33,4 +37,5 @@ for (let name in Memory.creeps) {
   if (role === 'harvester') harvesterRole.run(creep);
   else if (role === 'miner') minerRole.run(creep);
   else if (role === 'upgrader') upgraderRole.run(creep);
+  else if (role === 'builder') builderRole.run(creep);
 }
