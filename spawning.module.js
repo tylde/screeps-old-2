@@ -15,7 +15,7 @@ module.exports = {
       options.carryParts = 1;
       options.moveParts = 2;
       options.nameBase = 'H';
-      options.task = 'gather';
+      options.task = 'harvest';
     }
 
     if (type === 'upgrader') {
@@ -23,6 +23,14 @@ module.exports = {
       options.carryParts = 1;
       options.moveParts = 2;
       options.nameBase = 'U';
+      options.task = 'gather';
+    }
+
+    if (type === 'builder') {
+      options.workParts = 1;
+      options.carryParts = 1;
+      options.moveParts = 2;
+      options.nameBase = 'B';
       options.task = 'gather';
     }
 
