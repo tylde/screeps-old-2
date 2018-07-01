@@ -19,17 +19,17 @@ module.exports = {
     }
 
     if (type === 'upgrader') {
-      options.workParts = 1;
-      options.carryParts = 1;
-      options.moveParts = 2;
+      options.workParts = 2;
+      options.carryParts = 4;
+      options.moveParts = 6;
       options.nameBase = 'U';
       options.task = 'gather';
     }
 
     if (type === 'builder') {
-      options.workParts = 1;
-      options.carryParts = 1;
-      options.moveParts = 2;
+      options.workParts = 2;
+      options.carryParts = 2;
+      options.moveParts = 4;
       options.nameBase = 'B';
       options.task = 'gather';
     }
@@ -42,11 +42,11 @@ module.exports = {
       options.task = 'gather';
     }
 
-    if (type === 'repairer') {
+    if (type === 'transporter') {
       options.workParts = 1;
       options.carryParts = 1;
       options.moveParts = 2;
-      options.nameBase = 'R';
+      options.nameBase = 'T';
       options.task = 'gather';
     }
 

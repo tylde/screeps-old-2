@@ -6,6 +6,6 @@ module.exports = {
     else if (creep.memory.task === 'transport' && creep.carry.energy === 0) creep.memory.task = 'harvest';
 
     if (creep.memory.task === 'harvest') creepActions.harvestEnergy(creep);
-    else if (creep.memory.task === 'transport') creepActions.transportEnergy(creep);
+    else if (creep.memory.task === 'transport') creepActions.transportEnergyToSpawn(creep);
   }
 }
