@@ -41,7 +41,7 @@ module.exports = {
   constructStructures: creep => {
     const constructions = creep.room.find(FIND_CONSTRUCTION_SITES);
     if (constructions.length > 0) {
-      constructions.sort((a, b) => a.id < b.id);
+      constructions.sort((a, b) => a.id.toString() < b.id.toString());
       if (creep.build(constructions[0]) == ERR_NOT_IN_RANGE) creep.moveTo(constructions[0])
     }
     else creep.moveTo(Game.flags['B']);
@@ -59,6 +59,22 @@ module.exports = {
     });
     if (target) {
       if (creep.repair(target) == ERR_NOT_IN_RANGE) creep.moveTo(target);
+    }
+    else creep.moveTo(Game.flags['R']);
+  },
+
+  refillEnergy: creep => {
+    const target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+      filter: structure => {
+        return (
+          (structure.structureType == STRUCTURE_EXTENSION ||
+            structure.structureType == STRUCTURE_SPAWN) &&
+          structure.energy < structure.energyCapacity
+        );
+      }
+    });
+    if (target) {
+      if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) creep.moveTo(target);
     }
     else creep.moveTo(Game.flags['R']);
   }

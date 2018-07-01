@@ -50,6 +50,14 @@ module.exports = {
       options.task = 'gather';
     }
 
+    if (type === 'refiller') {
+      options.workParts = 0;
+      options.carryParts = 2;
+      options.moveParts = 2;
+      options.nameBase = 'RF';
+      options.task = 'gather';
+    }
+
     if (type === 'miner') {
       options.workParts = 2;
       options.carryParts = 0;
