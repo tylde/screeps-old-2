@@ -34,6 +34,22 @@ module.exports = {
       options.task = 'gather';
     }
 
+    if (type === 'repairer') {
+      options.workParts = 1;
+      options.carryParts = 1;
+      options.moveParts = 2;
+      options.nameBase = 'R';
+      options.task = 'gather';
+    }
+
+    if (type === 'repairer') {
+      options.workParts = 1;
+      options.carryParts = 1;
+      options.moveParts = 2;
+      options.nameBase = 'R';
+      options.task = 'gather';
+    }
+
     if (type === 'miner') {
       options.workParts = 2;
       options.carryParts = 0;
@@ -58,6 +74,8 @@ module.exports = {
 
 
     const spawnAlpha = Game.spawns['Alpha'];
+    if (spawnAlpha.spawning) return;
+
     const spawnResult = spawnAlpha.spawnCreep(creepBody, options.name, {
       memory: { role: type, task: options.task, number: options.number }
     });

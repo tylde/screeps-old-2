@@ -1,7 +1,7 @@
 module.exports = {
   run: creep => {
     const containers = creep.room.find(FIND_STRUCTURES, {
-      filter: structure => structure.structureType == STRUCTURE_SPAWN
+      filter: structure => structure.structureType == STRUCTURE_CONTAINER
     });
     containers.sort((a, b) => a.id < b.id);
 
