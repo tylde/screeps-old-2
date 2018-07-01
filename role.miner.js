@@ -1,4 +1,4 @@
-roleMiner = {
+module.exports = {
   run: creep => {
     const containers = creep.room.find(FIND_STRUCTURES, {
       filter: structure => structure.structureType == STRUCTURE_SPAWN
@@ -14,5 +14,3 @@ roleMiner = {
     else creep.moveTo(container);
   }
 }
-
-module.exports = roleMiner;

@@ -1,13 +1,13 @@
 module.exports = {
   run: creep => {
-    if (creep.memory.isWorking === false && creep.carry.energy === 0) creep.memory.isWorking = true;
-    else if (creep.memory.isWorking === true && creep.carry.energy === creep.carryCapacity) creep.memory.isWorking = false;
+    if (creep.memory.task === 'gather' && creep.carry.energy === creep.carryCapacity) creep.memory.task = 'transport';
+    else if (creep.memory.task === 'transport' && creep.carry.energy === 0) creep.memory.task = 'gather';
 
-    if (creep.memory.isWorking === true) {
+    if (creep.memory.task === 'gather') {
       const source = creep.pos.findClosestByPath(FIND_SOURCES);
       if (creep.harvest(source) === ERR_NOT_IN_RANGE) creep.moveTo(source);
     }
-    else {
+    else if (creep.memory.task === 'transport') {
       const targets = creep.room.find(FIND_STRUCTURES, {
         filter: structure => structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity
       });

@@ -6,28 +6,32 @@ module.exports = {
       moveParts: 0,
       nameBase: '',
       name: '',
-      number: 0
+      number: 0,
+      task: ''
     }
 
     if (type === 'harvester') {
       options.workParts = 1;
       options.carryParts = 1;
       options.moveParts = 2;
-      options.nameBase = 'H'
+      options.nameBase = 'H';
+      options.task = 'gather';
     }
 
     if (type === 'upgrader') {
       options.workParts = 1;
       options.carryParts = 1;
       options.moveParts = 2;
-      options.nameBase = 'U'
+      options.nameBase = 'U';
+      options.task = 'gather';
     }
 
-    if (type === 'MINER') {
+    if (type === 'miner') {
       options.workParts = 2;
       options.carryParts = 0;
       options.moveParts = 1;
-      options.nameBase = 'M'
+      options.nameBase = 'M';
+      options.task = 'mine';
     }
 
     const typeAmount = _.filter(Game.creeps, creep => creep.memory.role === type);
@@ -47,7 +51,7 @@ module.exports = {
 
     const spawnAlpha = Game.spawns['Alpha'];
     const spawnResult = spawnAlpha.spawnCreep(creepBody, options.name, {
-      memory: { role: type, isWorking: true, number: options.number }
+      memory: { role: type, task: options.task, number: options.number }
     });
 
     if (spawnResult === OK) {
