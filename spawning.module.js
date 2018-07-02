@@ -36,15 +36,15 @@ module.exports = {
 
     if (type === 'repairer') {
       options.workParts = 1;
-      options.carryParts = 1;
-      options.moveParts = 2;
+      options.carryParts = 3;
+      options.moveParts = 4;
       options.nameBase = 'R';
       options.task = 'gather';
     }
 
     if (type === 'transporter') {
-      options.workParts = 1;
-      options.carryParts = 1;
+      options.workParts = 0;
+      options.carryParts = 4;
       options.moveParts = 2;
       options.nameBase = 'T';
       options.task = 'gather';
@@ -59,7 +59,7 @@ module.exports = {
     }
 
     if (type === 'miner') {
-      options.workParts = 2;
+      options.workParts = 3;
       options.carryParts = 0;
       options.moveParts = 1;
       options.nameBase = 'M';
