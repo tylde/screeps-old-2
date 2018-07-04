@@ -56,3 +56,12 @@ for (let name in Memory.creeps) {
   else if (role === 'refiller') refillerRole.run(creep);
   else if (role === 'transporter') transporterRole.run(creep);
 }
+
+const towers = Game.rooms["W3N7"].find(FIND_STRUCTURES, {
+  filter: structure => structure.structureType == STRUCTURE_TOWER
+});
+for (let tower of towers) {
+  const target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+  if (target === undefined || target === null) return;
+  tower.attack(target);
+}
