@@ -8,6 +8,8 @@ const repairerRole = require('role.repairer');
 const refillerRole = require('role.refiller');
 const transporterRole = require('role.transporter');
 
+require('require');
+
 const HARVESTER_MAX_AMOUNT = 0;
 const UPGRADERS_MAX_AMOUNT = 6;
 const MINERS_MAX_AMOUNT = 4;

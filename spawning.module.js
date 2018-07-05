@@ -19,9 +19,9 @@ module.exports = {
     }
 
     if (type === 'upgrader') {
-      options.workParts = 2;
-      options.carryParts = 4;
-      options.moveParts = 6;
+      options.workParts = 5;
+      options.carryParts = 10;
+      options.moveParts = 10;
       options.nameBase = 'U';
       options.task = 'gather';
     }
