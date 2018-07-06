@@ -85,7 +85,12 @@ module.exports = {
     if (spawnAlpha.spawning) return;
 
     const spawnResult = spawnAlpha.spawnCreep(creepBody, options.name, {
-      memory: { role: type, task: options.task, number: options.number }
+      memory: {
+        role: type,
+        task: options.task,
+        number: options.number,
+        homeRoom: spawnAlpha.room.name
+      }
     });
 
     if (spawnResult === OK) {

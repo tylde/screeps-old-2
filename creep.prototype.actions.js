@@ -1,7 +1,10 @@
 Creep.prototype.harvestEnergy = function () {
   const creep = this;
 
-  const source = creep.findClosestSource();
+  let source = null;
+  if (creep.memory.sourceId !== undefined) source = Game.getObjectById(creep.memory.sourceId);
+  else source = creep.findClosestSource();
+
   if (creep.harvest(source) === ERR_NOT_IN_RANGE) creep.moveTo(source);
 }
 
@@ -15,7 +18,7 @@ Creep.prototype.getEnergy = function () {
     if (creep.withdraw(storage, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) creep.moveTo(storage);
   }
   else {
-    const containers = creep.findContainersInRoom();
+    const containers = creep.findContainers();
     if (containers.length > 0) {
       const container = creep.findClosestContainer();
       if (creep.withdraw(container, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) creep.moveTo(container);
@@ -52,10 +55,11 @@ Creep.prototype.transportEnergyToSpawn = function () {
 Creep.prototype.constructStructures = function () {
   const creep = this;
 
-  const constructions = creep.room.find(FIND_CONSTRUCTION_SITES);
-  if (constructions.length > 0) {
-    constructions.sort((a, b) => a.id.toString() < b.id.toString());
-    if (creep.build(constructions[0]) == ERR_NOT_IN_RANGE) creep.moveTo(constructions[0])
+  let construction = null;
+  if (creep.memory.constructionId !== undefined) construction = Game.getObjectById(creep.memory.constructionId);
+  else construction = creep.findClosestConstructionSite();
+  if (construction !== undefined && construction !== null) {
+    if (creep.build(construction) == ERR_NOT_IN_RANGE) creep.moveTo(construction)
   }
   else creep.moveTo(Game.flags['B']);
 };
@@ -103,16 +107,14 @@ Creep.prototype.refillEnergy = function () {
 
 
 
-Creep.prototype.withdrawEnergy = function () {
+Creep.prototype.withdrawEnergyFromContainer = function () {
   const creep = this;
 
-  const containers = creep.findContainersInRoom();
-  if (containers.length > 0) {
-    containers.sort((a, b) => a.id < b.id);
-    const container = containers[creep.memory.number - 1];
+  let container = null;
+  if (creep.memory.containerId !== undefined) container = Game.getObjectById(creep.memory.containerId);
+  else container = creep.findClosestContainer;
 
-    if (creep.withdraw(container, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) creep.moveTo(container);
-  }
+  if (creep.withdraw(container, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) creep.moveTo(container);
 };
 
 
