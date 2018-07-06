@@ -1,17 +1,9 @@
 const spawningModule = require('./spawning.module');
 
-const harvesterRole = require('./role.harvester');
-const upgraderRole = require('role.upgrader');
-const minerRole = require('role.miner');
-const builderRole = require('role.builder');
-const repairerRole = require('role.repairer');
-const refillerRole = require('role.refiller');
-const transporterRole = require('role.transporter');
-
 require('require');
 
 const HARVESTER_MAX_AMOUNT = 0;
-const UPGRADERS_MAX_AMOUNT = 6;
+const UPGRADERS_MAX_AMOUNT = 4;
 const MINERS_MAX_AMOUNT = 4;
 const BUILDERS_MAX_AMOUNT = 1;
 const REPAIRERS_MAX_AMOUNT = 2;
@@ -43,20 +35,12 @@ module.exports.loop = () => {
       delete Memory.creeps[name];
       console.log('Clearing non-existing creep memory:', name);
     }
+    else {
+      const creep = Game.creeps[name];
+      creep.run();
+    }
   }
 
-  for (let name in Memory.creeps) {
-    const creep = Game.creeps[name];
-    const role = creep.memory.role;
-
-    if (role === 'harvester') harvesterRole.run(creep);
-    else if (role === 'miner') minerRole.run(creep);
-    else if (role === 'upgrader') upgraderRole.run(creep);
-    else if (role === 'builder') builderRole.run(creep);
-    else if (role === 'repairer') repairerRole.run(creep);
-    else if (role === 'refiller') refillerRole.run(creep);
-    else if (role === 'transporter') transporterRole.run(creep);
-  }
 
   const towers = Game.rooms["W3N7"].find(FIND_STRUCTURES, {
     filter: structure => structure.structureType == STRUCTURE_TOWER
