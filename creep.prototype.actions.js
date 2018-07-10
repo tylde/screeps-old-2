@@ -36,13 +36,11 @@ Creep.prototype.pioneer = function () {
   }
 }
 Creep.prototype.pioneerRefillment = function () {
-  if (actualRoomRefillPioneerId === creep.id) {
-    const structure = creep.findClosestEmptySpawnsAndExtensions();
-    if (structure) {
-      if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) creep.moveTo(structure);
-    }
-    else actualRoomRefillPioneerId = undefined;
+  const structure = creep.findClosestEmptySpawnsAndExtensions();
+  if (structure) {
+    if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) creep.moveTo(structure);
   }
+  else actualRoomRefillPioneerId = undefined;
 }
 Creep.prototype.pioneerStructures = function () {
   if (creep.memory.constructionId === undefined) {
