@@ -13,15 +13,21 @@ Creep.prototype.harvestEnergy = function () {
 Creep.prototype.pioneer = function () {
   const creep = this;
 
-  switch (creep.room.actualRefillPioneerId) {
+  const actualRoomRefillPioneerId = creep.room.memory.actualRefillPioneerId;
+  if (!Game.getObjectById(actualRoomRefillPioneerId)) actualRoomRefillPioneerId = undefined;
+
+  switch (actualRoomRefillPioneerId) {
     case creep.id: {
       creep.pioneerRefillment();
       break;
     }
     case undefined: {
-      if (structuresToFill) creep.room.actualRefillPioneerId = creep.id;
-      creep.pioneerRefillment();
-      break;
+      const structuresToFill = creep.findEmptySpawnsAndExtensions();
+      if (structuresToFill.length > 0) {
+        actualRoomRefillPioneerId = creep.id;
+        creep.pioneerRefillment();
+        break;
+      }
     }
     default: {
       if (creep.pioneerStructures() === ERR_NOT_FOUND) creep.upgradeController();
@@ -30,12 +36,12 @@ Creep.prototype.pioneer = function () {
   }
 }
 Creep.prototype.pioneerRefillment = function () {
-  if (creep.room.actualRefillPioneerId === creep.id) {
+  if (actualRoomRefillPioneerId === creep.id) {
     const structure = creep.findClosestEmptySpawnsAndExtensions();
     if (structure) {
       if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) creep.moveTo(structure);
     }
-    else creep.room.actualRefillPioneerId = undefined;
+    else actualRoomRefillPioneerId = undefined;
   }
 }
 Creep.prototype.pioneerStructures = function () {
