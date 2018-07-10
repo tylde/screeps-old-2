@@ -1,14 +1,15 @@
 Creep.prototype.harvestEnergy = function () {
   const creep = this;
 
-  let source = null;
-  if (creep.memory.sourceId) source = Game.getObjectById(creep.memory.sourceId);
-  else source = creep.findClosestSource();
-
-  if (creep.harvest(source) === ERR_NOT_IN_RANGE) creep.moveTo(source);
+  const source = (creep.memory.sourceId ? Game.getObjectById(creep.memory.sourceId) : creep.findClosestSource());
+  if (source) {
+    if (creep.harvest(source) === ERR_NOT_IN_RANGE) creep.moveTo(source);
+  }
+  else {
+    console.log(`${creep.name}: Source is undefined!`);
+    creep.memory.sourceId = undefined;
+  }
 }
-
-
 
 Creep.prototype.pioneer = function () {
   const creep = this;
@@ -36,6 +37,8 @@ Creep.prototype.pioneer = function () {
   }
 }
 Creep.prototype.pioneerRefillment = function () {
+  const creep = this;
+
   const structure = creep.findClosestEmptySpawnsAndExtensions();
   if (structure) {
     if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) creep.moveTo(structure);
@@ -43,6 +46,8 @@ Creep.prototype.pioneerRefillment = function () {
   else actualRoomRefillPioneerId = undefined;
 }
 Creep.prototype.pioneerStructures = function () {
+  const creep = this;
+
   if (creep.memory.constructionId === undefined) {
     const construction = creep.findClosestConstructionSite();
     if (construction) {
@@ -63,6 +68,7 @@ Creep.prototype.pioneerStructures = function () {
     }
   }
 }
+
 
 
 

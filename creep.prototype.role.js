@@ -1,4 +1,4 @@
-Creep.progress.runPioneer = function () {
+const getPioneersSourceId = function (creep) {
   if (creep.memory.sourceId === undefined) {
     const sources = creep.findSources().sort((a, b) => a.id < b.id);
     if (sources > 0) {
@@ -7,12 +7,17 @@ Creep.progress.runPioneer = function () {
     }
     else creep.memory.sourceId = null;
   }
+}
 
+Creep.prototype.runPioneer = function () {
+  const creep = this;
 
-  if (creep.memory.task === 'gather' && creep.carry.energy === creep.carryCapacity) creep.memory.task = 'pioneer';
-  else if (creep.memory.task === 'pioneer' && creep.carry.energy === 0) creep.memory.task = 'gather';
+  getPioneersSourceId(creep);
 
-  if (creep.memory.task === 'gather') creep.harvestEnergy();
+  if (creep.memory.task === 'harvest' && creep.carry.energy === creep.carryCapacity) creep.memory.task = 'pioneer';
+  else if (creep.memory.task === 'pioneer' && creep.carry.energy === 0) creep.memory.task = 'harvest';
+
+  if (creep.memory.task === 'harvest') creep.harvestEnergy();
   else if (creep.memory.task === 'pioneer') creep.pioneer();
 }
 
