@@ -2,15 +2,15 @@ Room.prototype.run = function () {
   const room = this;
 
   const HARVESTER_MAX_AMOUNT = 1;
-  const UPGRADERS_MAX_AMOUNT = 4;
-  const MINERS_MAX_AMOUNT = 4;
-  const BUILDERS_MAX_AMOUNT = 1;
+  const UPGRADERS_MAX_AMOUNT = 6;
+  const MINERS_MAX_AMOUNT = 2;
+  const BUILDERS_MAX_AMOUNT = 2;
   const REPAIRERS_MAX_AMOUNT = 0;
+  const DEFENSE_REPAIRERS_MAX_AMOUNT = 1;
   const REFILLERS_MAX_AMOUNT = 2;
-  const TRANSPORTERS_MAX_AMOUNT = 4;
+  const TRANSPORTERS_MAX_AMOUNT = 2;
 
   const creeps = room.getRoomCreeps();
-  const roomPhase = room.getRoomPhase();
 
   room.manageTowers();
 
@@ -19,29 +19,45 @@ Room.prototype.run = function () {
   const miners = _.filter(creeps, creep => creep.memory.role === 'miner');
   const builders = _.filter(creeps, creep => creep.memory.role === 'builder');
   const repairers = _.filter(creeps, creep => creep.memory.role === 'repairer');
+  const defenseRepairers = _.filter(creeps, creep => creep.memory.role === 'defenserepairer');
   const refillers = _.filter(creeps, creep => creep.memory.role === 'refiller');
   const transporters = _.filter(creeps, creep => creep.memory.role === 'transporter');
 
   const containers = room.find(FIND_STRUCTURES, { filter: structure => structure.structureType == STRUCTURE_CONTAINER });
-  const towers = room.find(FIND_STRUCTURES, { filter: structure => structure.structureType == STRUCTURE_CONTAINER });
+  const towers = room.find(FIND_STRUCTURES, { filter: structure => structure.structureType == STRUCTURE_TOWER });
   const construcionSites = room.find(FIND_CONSTRUCTION_SITES);
+  const defenseStructures = room.find(FIND_STRUCTURES, { filter: structure => structure.structureType == STRUCTURE_WALL || structure.structureType == STRUCTURE_RAMPART });
 
 
-  const isHarvesterNeeded = harvesters.length < HARVESTER_MAX_AMOUNT && !room.storage && containers.length === 0;
-  const isBuilderNeeded = builders.length < BUILDERS_MAX_AMOUNT && construcionSites.length > 0;
-  const isRepairerNeeded = repairers.length < REPAIRERS_MAX_AMOUNT && towers.length === 0;
+  const isRepairerNeeded = repairers.length < REPAIRERS_MAX_AMOUNT && towers.length < 1;
+  const isDefenseRepairerNeeded = defenseRepairers.length < DEFENSE_REPAIRERS_MAX_AMOUNT && defenseStructures.length > 0;
   const isUpgraderNeeded = upgraders.length < UPGRADERS_MAX_AMOUNT;
+  const isBuilderNeeded = builders.length < BUILDERS_MAX_AMOUNT && construcionSites.length > 0;
+  // const isHarvesterNeeded = harvesters.length < HARVESTER_MAX_AMOUNT && !room.storage && containers.length === 0;
+  const isHarvesterNeeded = harvesters.length < HARVESTER_MAX_AMOUNT;
   const isTransporterNeeded = transporters.length < TRANSPORTERS_MAX_AMOUNT && transporters.length < containers.length && room.storage;
   const isMinerNeeded = miners.length < MINERS_MAX_AMOUNT && miners.length < containers.length;
   const isRefillerNeeded = refillers.length < REFILLERS_MAX_AMOUNT && (room.storage || containers.length > 0);
 
-  if (isHarvesterNeeded) room.spawnCreep('harvester');
-  if (isBuilderNeeded) room.spawnCreep('builder');
-  if (isRepairerNeeded) room.spawnCreep('repairer');
-  if (isUpgraderNeeded) room.spawnCreep('upgrader');
-  if (isTransporterNeeded) room.spawnCreep('transporter');
-  if (isMinerNeeded) room.spawnCreep('miner');
-  if (isRefillerNeeded) room.spawnCreep('refiller');
+  let creepToSpawn = null;
+  if (creepToSpawn === null && isMinerNeeded) creepToSpawn = 'miner';
+  if (creepToSpawn === null && isRefillerNeeded) creepToSpawn = 'refiller';
+  if (creepToSpawn === null && isTransporterNeeded) creepToSpawn = 'transporter';
+  if (creepToSpawn === null && isHarvesterNeeded) creepToSpawn = 'harvester';
+  if (creepToSpawn === null && isBuilderNeeded) creepToSpawn = 'builder';
+  if (creepToSpawn === null && isUpgraderNeeded) creepToSpawn = 'upgrader';
+  if (creepToSpawn === null && isRepairerNeeded) creepToSpawn = 'repairer';
+  if (creepToSpawn === null && isDefenseRepairerNeeded) creepToSpawn = 'defenserepairer';
+
+  if (creepToSpawn !== null) room.spawnCreep(creepToSpawn);
+
+  // if (isUpgraderNeeded) room.spawnCreep('upgrader');
+  // if (isBuilderNeeded) room.spawnCreep('builder');
+  // if (isRepairerNeeded) room.spawnCreep('repairer');
+  // if (true) room.spawnCreep('harvester');
+  // if (isTransporterNeeded) room.spawnCreep('transporter');
+  // if (isRefillerNeeded) room.spawnCreep('refiller');
+  // if (isMinerNeeded) room.spawnCreep('miner');
 
 }
 
@@ -58,18 +74,16 @@ Room.prototype.getRoomCreeps = function () {
 }
 
 Room.prototype.spawnHarvester = function () {
-  const options = {
-    workParts: 1,
-    carryParts: 1,
-    moveParts: 2,
-    nameBase: 'H',
-    name: '',
-    number: 0,
-    task: 'harvest'
-  }
+  const partsBase = [WORK, CARRY, MOVE, MOVE];
+  const nameBase = 'H';
+  const task = 'harvest';
+  const number = 0;
+  const name = '';
+
 
 
 }
+
 
 Room.prototype.spawnCreep = function (type) {
   const room = this;
@@ -79,6 +93,8 @@ Room.prototype.spawnCreep = function (type) {
   // for (let spawn in spawns) {
 
   // }
+
+  if (!spawn) return;
 
   const options = {
     workParts: 0,
@@ -99,26 +115,34 @@ Room.prototype.spawnCreep = function (type) {
   }
 
   if (type === 'upgrader') {
-    options.workParts = 5;
-    options.carryParts = 10;
-    options.moveParts = 10;
+    options.workParts = 3;
+    options.carryParts = 3;
+    options.moveParts = 3;
     options.nameBase = 'U';
     options.task = 'gather';
   }
 
   if (type === 'builder') {
-    options.workParts = 2;
-    options.carryParts = 2;
-    options.moveParts = 4;
+    options.workParts = 3;
+    options.carryParts = 3;
+    options.moveParts = 3;
     options.nameBase = 'B';
     options.task = 'gather';
   }
 
   if (type === 'repairer') {
     options.workParts = 1;
-    options.carryParts = 3;
-    options.moveParts = 4;
+    options.carryParts = 1;
+    options.moveParts = 2;
     options.nameBase = 'R';
+    options.task = 'gather';
+  }
+
+  if (type === 'defenserepairer') {
+    options.workParts = 2;
+    options.carryParts = 2;
+    options.moveParts = 2;
+    options.nameBase = 'DR';
     options.task = 'gather';
   }
 
@@ -139,14 +163,14 @@ Room.prototype.spawnCreep = function (type) {
   }
 
   if (type === 'miner') {
-    options.workParts = 3;
+    options.workParts = 4;
     options.carryParts = 0;
     options.moveParts = 1;
     options.nameBase = 'M';
     options.task = 'mine';
   }
 
-  const typeAmount = _.filter(Game.creeps, creep => creep.memory.role === type);
+  const typeAmount = _.filter(Game.creeps, creep => creep.memory.role === type && creep.memory.homeRoom === spawn.room.name);
 
   for (let i = 1; i <= typeAmount.length + 1; i++) {
     options.name = options.nameBase + i;
@@ -179,10 +203,6 @@ Room.prototype.spawnCreep = function (type) {
 
 
 
-Room.prototype.getRoomPhase = function () {
-
-}
-
 
 
 Room.prototype.manageTowers = function () {
@@ -193,16 +213,10 @@ Room.prototype.manageTowers = function () {
   });
   for (let tower of towers) {
     const target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-
-    if (target !== undefined && target !== null) tower.attack(target);
+    if (target) tower.attack(target);
     else {
       const structuresToRepair = room.find(FIND_STRUCTURES, {
-        filter: structure => {
-          return (
-            (structure.structureType == STRUCTURE_ROAD || structure.structureType == STRUCTURE_CONTAINER) &&
-            structure.hits < structure.hitsMax
-          );
-        }
+        filter: structure => (structure.structureType == STRUCTURE_ROAD || structure.structureType == STRUCTURE_CONTAINER) && structure.hits < structure.hitsMax
       });
       if (structuresToRepair) tower.repair(structuresToRepair[0]);
     }

@@ -10,6 +10,37 @@ Creep.prototype.findClosestContainer = function () {
     filter: structure => structure.structureType == STRUCTURE_CONTAINER
   });
 };
+Creep.prototype.findClosestContainerWithEnergy = function () {
+  const creep = this;
+  creep.pos.findClosestByPath(FIND_STRUCTURES, {
+    filter: structure => structure.structureType == STRUCTURE_CONTAINER && structure.energy > 0
+  });
+
+  let target;
+
+  var containers = creep.room.find(FIND_STRUCTURES, {
+    filter: structure => structure.structureType == STRUCTURE_CONTAINER
+  });
+  var closest = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+    filter: structure => structure.structureType == STRUCTURE_CONTAINER
+  });
+
+  if (closest && closest.energy > 300) {
+    console.log(closest.energy)
+    target = closest;
+  }
+  else {
+    for (i = 0; i < containers.length; i++) {
+      if (containers[i] != closest) {
+        target = containers[i];
+      }
+    }
+  }
+
+  return target;
+
+
+};
 
 
 

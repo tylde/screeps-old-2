@@ -18,9 +18,12 @@ Creep.prototype.getEnergy = function () {
     if (creep.withdraw(storage, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) creep.moveTo(storage);
   }
   else {
-    const containers = creep.findContainers();
-    if (containers.length > 0) {
-      const container = creep.findClosestContainer();
+    // const container = creep.findClosestContainerWithEnergy();
+    const container = Game.getObjectById(creep.memory.containerId) || creep.findClosestContainer();
+
+    if (container) {
+      // const container = creep.findClosestContainer();
+
       if (creep.withdraw(container, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) creep.moveTo(container);
     }
     else {
@@ -44,9 +47,9 @@ Creep.prototype.transportEnergyToSpawn = function () {
   const creep = this;
 
   const targets = creep.room.find(FIND_STRUCTURES, {
-    filter: structure => structure.structureType == STRUCTURE_SPAWN && structure.energy < structure.energyCapacity
+    filter: structure => (structure.structureType == STRUCTURE_SPAWN || structure.structureType == STRUCTURE_EXTENSION) && structure.energy < structure.energyCapacity
   });
-
+  if (targets.length === 0) { creep.moveTo(Game.flags['H']); return; }
   if (creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) creep.moveTo(targets[0]);
 };
 
@@ -83,6 +86,31 @@ Creep.prototype.repairStructures = function () {
   }
   else creep.moveTo(Game.flags['R']);
 };
+
+
+
+Creep.prototype.repairDefenseStructures = function () {
+  const creep = this;
+
+  const targets = creep.room.find(FIND_STRUCTURES, {
+    filter: structure => [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(structure.structureType)
+  });
+  if (targets.length === 0) { creep.moveTo(Game.flags['R']); return; }
+
+  const tragetsHits = [...targets];
+  const hitsSummary = tragetsHits.reduce((acc, el) => acc + el.hits, 0);
+  const avegareHits = hitsSummary / targets.length;
+
+  const target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+    filter: structure => [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(structure.structureType) && structure.hits < avegareHits + 1000
+  });
+
+  if (target) {
+    if (creep.repair(target) == ERR_NOT_IN_RANGE) creep.moveTo(target);
+  }
+  else creep.moveTo(Game.flags['R']);
+
+}
 
 
 
