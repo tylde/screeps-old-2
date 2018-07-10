@@ -1,3 +1,22 @@
+Creep.progress.runPioneer = function () {
+  if (creep.memory.sourceId === undefined) {
+    const sources = creep.findSources().sort((a, b) => a.id < b.id);
+    if (sources > 0) {
+      const number = creep.memory.number % sources.length;
+      creep.memory.sourceId = sources[number].id;
+    }
+    else creep.memory.sourceId = null;
+  }
+
+
+  if (creep.memory.task === 'gather' && creep.carry.energy === creep.carryCapacity) creep.memory.task = 'pioneer';
+  else if (creep.memory.task === 'pioneer' && creep.carry.energy === 0) creep.memory.task = 'gather';
+
+  if (creep.memory.task === 'gather') creep.harvestEnergy();
+  else if (creep.memory.task === 'pioneer') creep.pioneer();
+}
+
+
 Creep.prototype.runBuilder = function () {
   const creep = this;
   // creep.moveTo(Game.flags['B']); return;

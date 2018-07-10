@@ -93,3 +93,28 @@ Creep.prototype.findClosestStructureToRepair = function () {
     }
   });
 };
+
+
+
+Creep.prototype.findEmptySpawnsAndExtensions = function () {
+  const creep = this;
+  return creep.room.find(FIND_STRUCTURES, {
+    filter: structure => {
+      return (
+        [STRUCTURE_SPAWN, STRUCTURE_EXTENSION].includes(structure.structureType) &&
+        structure.energy < structure.energyCapacity
+      );
+    }
+  });
+}
+Creep.prototype.findClosestEmptySpawnsAndExtensions = function () {
+  const creep = this;
+  return creep.pos.findClosestByPath(FIND_STRUCTURES, {
+    filter: structure => {
+      return (
+        [STRUCTURE_SPAWN, STRUCTURE_EXTENSION].includes(structure.structureType) &&
+        structure.energy < structure.energyCapacity
+      );
+    }
+  });
+}

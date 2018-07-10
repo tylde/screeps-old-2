@@ -1,14 +1,14 @@
 Room.prototype.run = function () {
   const room = this;
 
-  const HARVESTER_MAX_AMOUNT = 1;
-  const UPGRADERS_MAX_AMOUNT = 6;
-  const MINERS_MAX_AMOUNT = 2;
-  const BUILDERS_MAX_AMOUNT = 2;
+  const HARVESTER_MAX_AMOUNT = 0;
+  const UPGRADERS_MAX_AMOUNT = 0;
+  const MINERS_MAX_AMOUNT = 0;
+  const BUILDERS_MAX_AMOUNT = 0;
   const REPAIRERS_MAX_AMOUNT = 0;
-  const DEFENSE_REPAIRERS_MAX_AMOUNT = 1;
-  const REFILLERS_MAX_AMOUNT = 2;
-  const TRANSPORTERS_MAX_AMOUNT = 2;
+  const DEFENSE_REPAIRERS_MAX_AMOUNT = 0;
+  const REFILLERS_MAX_AMOUNT = 0;
+  const TRANSPORTERS_MAX_AMOUNT = 0;
 
   const creeps = room.getRoomCreeps();
 

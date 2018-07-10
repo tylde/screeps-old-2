@@ -2,10 +2,62 @@ Creep.prototype.harvestEnergy = function () {
   const creep = this;
 
   let source = null;
-  if (creep.memory.sourceId !== undefined) source = Game.getObjectById(creep.memory.sourceId);
+  if (creep.memory.sourceId) source = Game.getObjectById(creep.memory.sourceId);
   else source = creep.findClosestSource();
 
   if (creep.harvest(source) === ERR_NOT_IN_RANGE) creep.moveTo(source);
+}
+
+
+
+Creep.prototype.pioneer = function () {
+  const creep = this;
+
+  switch (creep.room.actualRefillPioneerId) {
+    case creep.id: {
+      creep.pioneerRefillment();
+      break;
+    }
+    case undefined: {
+      if (structuresToFill) creep.room.actualRefillPioneerId = creep.id;
+      creep.pioneerRefillment();
+      break;
+    }
+    default: {
+      if (creep.pioneerStructures() === ERR_NOT_FOUND) creep.upgradeController();
+      break;
+    }
+  }
+}
+Creep.prototype.pioneerRefillment = function () {
+  if (creep.room.actualRefillPioneerId === creep.id) {
+    const structure = creep.findClosestEmptySpawnsAndExtensions();
+    if (structure) {
+      if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) creep.moveTo(structure);
+    }
+    else creep.room.actualRefillPioneerId = undefined;
+  }
+}
+Creep.prototype.pioneerStructures = function () {
+  if (creep.memory.constructionId === undefined) {
+    const construction = creep.findClosestConstructionSite();
+    if (construction) {
+      creep.memory.constructionId = construction.id;
+      return OK;
+    }
+    else return ERR_NOT_FOUND;
+  }
+  else {
+    const construction = Game.getObjectById(creep.memory.constructionId);
+    if (construction) {
+      if (creep.build(construction) == ERR_NOT_IN_RANGE) creep.moveTo(construction);
+      return OK;
+    }
+    else {
+      creep.memory.constructionId = undefined;
+      return ERR_NOT_FOUND;
+    }
+  }
 }
 
 
