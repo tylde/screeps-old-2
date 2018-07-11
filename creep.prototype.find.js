@@ -118,3 +118,32 @@ Creep.prototype.findClosestEmptySpawnsAndExtensions = function () {
     }
   });
 }
+
+
+// Creep.prototype.findStructures(structuresTypeArray, additionalLogic) = function () {
+//   const creep = this;
+// }
+
+Creep.prototype.findStructureToRefill = function () {
+  const creep = this;
+
+  return creep.pos.findClosestByPath(FIND_STRUCTURES, {
+    filter: structure => {
+      return (
+        [STRUCTURE_SPAWN, STRUCTURE_EXTENSION, STRUCTURE_TOWER].includes(structure.structureType) &&
+        structure.energy < structure.energyCapacity
+      );
+    }
+  });
+}
+Creep.prototype.findStructuresToRefill = function () {
+  const creep = this;
+  return creep.room.find(FIND_STRUCTURES, {
+    filter: structure => {
+      return (
+        [STRUCTURE_SPAWN, STRUCTURE_EXTENSION, STRUCTURE_TOWER].includes(structure.structureType) &&
+        structure.energy < structure.energyCapacity
+      );
+    }
+  });
+}
