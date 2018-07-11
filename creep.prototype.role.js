@@ -1,7 +1,7 @@
 const getPioneersSourceId = function (creep) {
-  if (creep.memory.sourceId === undefined) {
+  if (creep.memory.sourceId === undefined || creep.memory.sourceId === null) {
     const sources = creep.findSources().sort((a, b) => a.id < b.id);
-    if (sources > 0) {
+    if (sources.length > 0) {
       const number = creep.memory.number % sources.length;
       creep.memory.sourceId = sources[number].id;
     }

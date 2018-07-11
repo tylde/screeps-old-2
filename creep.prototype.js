@@ -10,6 +10,7 @@ Creep.prototype.run = function () {
 
   if (role === 'harvester') creep.runHarvester();
   else if (role === 'miner') creep.runMiner();
+  else if (role === 'pioneer') creep.runPioneer();
   else if (role === 'upgrader') creep.runUpgrader();
   else if (role === 'builder') creep.runBuilder();
   else if (role === 'repairer') creep.runRepairer();
