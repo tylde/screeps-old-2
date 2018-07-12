@@ -1,15 +1,4 @@
-Creep.prototype.harvestEnergy = function () {
-  const creep = this;
 
-  const source = (creep.memory.sourceId ? Game.getObjectById(creep.memory.sourceId) : creep.findClosestSource());
-  if (source) {
-    if (creep.harvest(source) === ERR_NOT_IN_RANGE) creep.moveTo(source);
-  }
-  else {
-    console.log(`${creep.name}: Source is undefined!`);
-    creep.memory.sourceId = undefined;
-  }
-}
 
 Creep.prototype.pioneer = function () {
   const creep = this;
@@ -30,7 +19,7 @@ Creep.prototype.pioneer = function () {
       }
     }
     default: {
-      if (creep.pioneerStructures() === ERR_NOT_FOUND) creep.upgradeController();
+      if (creep.constructStructures() === ERR_NOT_FOUND) creep.upgradeController();
       break;
     }
   }
@@ -45,7 +34,7 @@ Creep.prototype.pioneerRefillment = function () {
   }
   else creep.room.memory.actualRefillPioneerId = undefined;
 }
-Creep.prototype.pioneerStructures = function () {
+Creep.prototype.constructStructures = function () {
   const creep = this;
 
   if (creep.memory.constructionId === undefined) {
@@ -71,12 +60,37 @@ Creep.prototype.pioneerStructures = function () {
 
 
 
+Creep.prototype.develop = function () {
+  const creep = this;
+
+  if (creep.constructStructures() === ERR_NOT_FOUND) creep.upgradeController();
+}
+
+
+
+
+
+Creep.prototype.harvestEnergy = function () {
+  const creep = this;
+
+  const source = (creep.memory.sourceId ? Game.getObjectById(creep.memory.sourceId) : creep.findClosestSource());
+  if (source) {
+    if (creep.harvest(source) === ERR_NOT_IN_RANGE) creep.moveTo(source);
+  }
+  else {
+    console.log(`${creep.name}: Source is undefined!`);
+    creep.memory.sourceId = undefined;
+  }
+}
+
 
 Creep.prototype.getEnergy = function () {
   const creep = this;
+  const storage = creep.room.storage;
 
   if (creep.room.storage !== undefined) {
-    const storage = creep.room.storage;
+    const flag = Game.flags[creep.name];
+    // if (storage.energy === 0) creep.moveTo(flag);
     if (creep.withdraw(storage, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) creep.moveTo(storage);
   }
   else {
@@ -96,12 +110,37 @@ Creep.prototype.getEnergy = function () {
 
 
 
-Creep.prototype._upgradeController = Creep.prototype.upgradeController;
-Creep.prototype.upgradeController = function () {
+
+Creep.prototype.getEnergyFromStorage = function () {
+  const creep = this;
+  const storage = creep.room.storage;
+  if (storage === undefined) return;
+
+  if (creep.withdraw(storage, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) creep.moveTo(storage);
+}
+
+
+Creep.prototype.withdrawEnergyFromContainer = function () {
   const creep = this;
 
-  if (creep._upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) creep.moveTo(creep.room.controller);
+  let container = null;
+  if (creep.memory.containerId !== undefined) container = Game.getObjectById(creep.memory.containerId);
+  else container = creep.findClosestContainer();
+
+  let result = null;
+  result = creep.withdraw(container, RESOURCE_ENERGY);
+  if (result === ERR_NOT_IN_RANGE) creep.moveTo(container);
 };
+
+
+
+Creep.prototype.transportEnergyToStorage = function () {
+  const creep = this;
+
+  const storage = creep.room.storage;
+  if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) creep.moveTo(storage);
+};
+
 
 
 
@@ -117,17 +156,33 @@ Creep.prototype.transportEnergyToSpawn = function () {
 
 
 
-Creep.prototype.constructStructures = function () {
+
+
+
+
+Creep.prototype._upgradeController = Creep.prototype.upgradeController;
+Creep.prototype.upgradeController = function () {
   const creep = this;
 
-  let construction = null;
-  if (creep.memory.constructionId !== undefined) construction = Game.getObjectById(creep.memory.constructionId);
-  else construction = creep.findClosestConstructionSite();
-  if (construction !== undefined && construction !== null) {
-    if (creep.build(construction) == ERR_NOT_IN_RANGE) creep.moveTo(construction)
-  }
-  else creep.moveTo(Game.flags['B']);
+  if (creep._upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) creep.moveTo(creep.room.controller);
 };
+
+
+
+
+
+
+// Creep.prototype.constructStructures = function () {
+//   const creep = this;
+
+//   let construction = null;
+//   if (creep.memory.constructionId !== undefined) construction = Game.getObjectById(creep.memory.constructionId);
+//   else construction = creep.findClosestConstructionSite();
+//   if (construction !== undefined && construction !== null) {
+//     if (creep.build(construction) == ERR_NOT_IN_RANGE) creep.moveTo(construction)
+//   }
+//   else creep.moveTo(Game.flags['B']);
+// };
 
 
 
@@ -162,10 +217,12 @@ Creep.prototype.repairDefenseStructures = function () {
   const tragetsHits = [...targets];
   const hitsSummary = tragetsHits.reduce((acc, el) => acc + el.hits, 0);
   const avegareHits = hitsSummary / targets.length;
+  // console.log(avegareHits)
 
   const target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-    filter: structure => [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(structure.structureType) && structure.hits < avegareHits + 1000
+    filter: structure => [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(structure.structureType) && structure.hits + 3500 < avegareHits
   });
+  // console.log(target.hits)
 
   if (target) {
     if (creep.repair(target) == ERR_NOT_IN_RANGE) creep.moveTo(target);
@@ -183,7 +240,7 @@ Creep.prototype.refillEnergy = function () {
     filter: structure => {
       return (
         (structure.structureType == STRUCTURE_EXTENSION ||
-          structure.structureType == STRUCTURE_TOWER ||
+          (creep.memory.number === 3 && structure.structureType == STRUCTURE_TOWER) ||
           structure.structureType == STRUCTURE_SPAWN) &&
         structure.energy < structure.energyCapacity
       );
@@ -192,26 +249,12 @@ Creep.prototype.refillEnergy = function () {
   if (target) {
     if (creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) creep.moveTo(target);
   }
-  else creep.moveTo(Game.flags['R']);
+  else {
+    const flag = Game.flags[creep.name];
+    creep.moveTo(flag);
+  }
+  // else creep.moveTo(Game.flags['R']);
 };
 
 
 
-Creep.prototype.withdrawEnergyFromContainer = function () {
-  const creep = this;
-
-  let container = null;
-  if (creep.memory.containerId !== undefined) container = Game.getObjectById(creep.memory.containerId);
-  else container = creep.findClosestContainer;
-
-  if (creep.withdraw(container, RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) creep.moveTo(container);
-};
-
-
-
-Creep.prototype.transportEnergyToStorage = function () {
-  const creep = this;
-
-  const storage = creep.room.storage;
-  if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) creep.moveTo(storage);
-};

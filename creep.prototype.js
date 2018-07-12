@@ -12,10 +12,9 @@ Creep.prototype.run = function () {
     case 'harvester': creep.runHarvester(); break;
     case 'miner': creep.runMiner(); break;
     case 'pioneer': creep.runPioneer(); break;
-    case 'upgrader': creep.runUpgrader(); break;
-    case 'builder': creep.runBuilder(); break;
+    case 'settler': creep.runSettler(); break;
     case 'repairer': creep.runRepairer(); break;
-    case 'defenserepairer': creep.runDefenseRepairer(); break;
+    case 'defenseRepairer': creep.runDefenseRepairer(); break;
     case 'refiller': creep.runRefiller(); break;
     case 'transporter': creep.runTransporter(); break;
   }

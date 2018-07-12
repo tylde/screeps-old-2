@@ -20,6 +20,7 @@ Room.prototype.run = function () {
   const refillersAmount = room.memory.creepAmount.refiller;
   const transportersAmount = room.memory.creepAmount.transporter;
   const pioneersAmount = room.memory.creepAmount.pioneer;
+  const settlersAmount = room.memory.creepAmount.settler;
 
   const containers = room.find(FIND_STRUCTURES, { filter: structure => structure.structureType == STRUCTURE_CONTAINER });
   const towers = room.find(FIND_STRUCTURES, { filter: structure => structure.structureType == STRUCTURE_TOWER });
@@ -31,59 +32,66 @@ Room.prototype.run = function () {
 
   const isCreepNeeded = {
     1: {
+      harvester: harvestersAmount < 2,
       pioneer: pioneersAmount < 6 * sources.length,
-      upgrader: false,
+      settler: false,
       miner: false,
-      builder: false,
       refiller: false,
       transporter: false,
       repairer: false,
-      defenseRepairer: false,
-      harvester: harvestersAmount < 1
+      defenseRepairer: false
     },
     2: {
+      harvester: harvestersAmount < 2,
       pioneer: pioneersAmount < 6 * sources.length,
-      upgrader: false,
+      settler: false,
       miner: false,
-      builder: false,
       refiller: false,
       transporter: false,
       repairer: false,
-      defenseRepairer: false,
-      harvester: harvestersAmount < 1
+      defenseRepairer: false
     },
     3: {
+      harvester: harvestersAmount < 2,
       pioneer: pioneersAmount < 5 * sources.length,
-      upgrader: false,
+      settler: false,
       miner: false,
-      builder: false,
       refiller: false,
       transporter: false,
       repairer: false,
-      defenseRepairer: false,
-      harvester: harvestersAmount < 2
+      defenseRepairer: false
     },
     4: {
-      pioneer: (minersAmount === 0 && transportersAmount === 0 && refillersAmount === 0) ? pioneersAmount < 5 * sources.length : pioneersAmount < 1,
-      upgrader: upgradersAmount < 4,
-      miner: room.storage && minersAmount < containers.length,
-      builder: false,
-      refiller: room.storage,
+      harvester: (room.storage) ? false : harvestersAmount < 2,
+      pioneer: (room.storage) ? false : pioneersAmount < 4 * sources.length,
+      settler: (room.storage) ? settlersAmount < 2 : false,
+      miner: minersAmount < 2,
+      refiller: refillersAmount < 2,
       transporter: transportersAmount < minersAmount,
       repairer: false,
-      defenseRepairer: false,
-      harvester: !room.storage && harvestersAmount < 2
+      defenseRepairer: defenseRepairersAmount < 1
+    },
+    5: {
+      harvester: (room.storage) ? false : harvestersAmount < 2,
+      pioneer: (room.storage) ? false : pioneersAmount < 4 * sources.length,
+      settler: (room.storage) ? settlersAmount < 2 : false,
+      miner: minersAmount < 2,
+      refiller: refillersAmount < 2,
+      transporter: transportersAmount < minersAmount,
+      repairer: false,
+      defenseRepairer: defenseRepairersAmount < 1
     }
+
   }
+  // console.log()
 
   const rolesPriority = [
     'harvester',
     'miner',
-    'refiller',
     'transporter',
+    'refiller',
     'pioneer',
-    'builder',
-    'upgrader',
+    'settler',
     'repairer',
     'defenseRepairer'
   ]
@@ -98,7 +106,12 @@ Room.prototype.run = function () {
 
   switch (creepToSpawn) {
     case 'pioneer': room.spawnPioneer(); break;
+    case 'settler': room.spawnSettler(); break;
     case 'harvester': room.spawnHarvester(); break;
+    case 'miner': room.spawnMiner(); break;
+    case 'transporter': room.spawnTransporter(); break;
+    case 'refiller': room.spawnRefiller(); break;
+    case 'defenseRepairer': room.spawnDefenseRepairer(); break;
   }
 
   if (creepsAmount === 0 && room.energyAvailable !== room.energyCapacityAvailable) room.spawnEmergencyHarvester();
@@ -117,10 +130,11 @@ Room.prototype.updateMemory = function () {
     miner: _.filter(creeps, creep => creep.memory.role === 'miner').length,
     builder: _.filter(creeps, creep => creep.memory.role === 'builder').length,
     repairer: _.filter(creeps, creep => creep.memory.role === 'repairer').length,
-    defenseRepairer: _.filter(creeps, creep => creep.memory.role === 'defenserepairer').length,
+    defenseRepairer: _.filter(creeps, creep => creep.memory.role === 'defenseRepairer').length,
     refiller: _.filter(creeps, creep => creep.memory.role === 'refiller').length,
     transporter: _.filter(creeps, creep => creep.memory.role === 'transporter').length,
-    pioneer: _.filter(creeps, creep => creep.memory.role === 'pioneer').length
+    pioneer: _.filter(creeps, creep => creep.memory.role === 'pioneer').length,
+    settler: _.filter(creeps, creep => creep.memory.role === 'settler').length
   }
 }
 
@@ -153,7 +167,7 @@ Room.prototype.manageTowers = function () {
     if (target) tower.attack(target);
     else {
       const structuresToRepair = room.find(FIND_STRUCTURES, {
-        filter: structure => (structure.structureType == STRUCTURE_ROAD || structure.structureType == STRUCTURE_CONTAINER) && structure.hits < structure.hitsMax
+        filter: structure => [STRUCTURE_ROAD, STRUCTURE_CONTAINER].includes(structure.structureType) && structure.hits < structure.hitsMax
       });
       if (structuresToRepair) tower.repair(structuresToRepair[0]);
     }

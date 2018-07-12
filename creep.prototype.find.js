@@ -26,7 +26,6 @@ Creep.prototype.findClosestContainerWithEnergy = function () {
   });
 
   if (closest && closest.energy > 300) {
-    console.log(closest.energy)
     target = closest;
   }
   else {
