@@ -21,6 +21,115 @@ Creep.prototype.runPioneer = function () {
   else if (creep.memory.task === 'pioneer') creep.pioneer();
 }
 
+
+Creep.prototype.runReserver = function () {
+  const creep = this;
+
+  if (creep.pos.roomName !== creep.memory.destRoom) {
+    const exit = creep.room.findExitTo(creep.memory.destRoom);
+    creep.moveTo(creep.pos.findClosestByRange(exit));
+  }
+  else {
+    if (creep.reserveController(creep.room.controller) == ERR_NOT_IN_RANGE) creep.moveTo(creep.room.controller);
+  }
+}
+
+Creep.prototype.runClaimer = function () {
+  const creep = this;
+
+  if (creep.pos.roomName !== creep.memory.destRoom) {
+    const exit = creep.room.findExitTo(creep.memory.destRoom);
+    creep.moveTo(creep.pos.findClosestByRange(exit));
+  }
+  else {
+    if (creep.claimController(creep.room.controller) == ERR_NOT_IN_RANGE) creep.moveTo(creep.room.controller);
+  }
+}
+
+Creep.prototype.runSpawnBuilder = function () {
+  const creep = this;
+
+  if (creep.memory.task === 'harvest' && creep.carry.energy === creep.carryCapacity) creep.memory.task = 'build';
+  else if (creep.memory.task === 'build' && creep.carry.energy === 0) creep.memory.task = 'harvest';
+
+  if (creep.memory.task === 'harvest') {
+    if (creep.pos.roomName !== creep.memory.destRoom) {
+      const exit = creep.room.findExitTo(creep.memory.destRoom);
+      creep.moveTo(creep.pos.findClosestByRange(exit));
+    }
+    else {
+      const source = creep.findClosestSource();
+      if (creep.harvest(source) === ERR_NOT_IN_RANGE) creep.moveTo(source);
+    }
+  }
+  else if (creep.memory.task === 'build') {
+    if (creep.pos.roomName !== creep.memory.destRoom) {
+      const exit = creep.room.findExitTo(creep.memory.destRoom);
+      creep.moveTo(creep.pos.findClosestByRange(exit));
+    }
+    else {
+      creep.constructStructures();
+    }
+  }
+
+
+}
+
+
+Creep.prototype.runAttacker = function () {
+  const creep = this;
+
+
+  if (creep.pos.roomName === creep.memory.homeRoom) {
+    const exit = creep.room.findExitTo(creep.memory.destRoom);
+    creep.moveTo(creep.pos.findClosestByRange(exit));
+  }
+  else if (creep.pos.roomName === creep.memory.destRoom) {
+    let spawn = null;
+    if (creep.name === 'A1') spawn = creep.findClosestExtension();
+    if (creep.name === 'A2') spawn = creep.findClosestSpawn();
+
+    if (spawn) {
+      if (creep.attack(spawn) == ERR_NOT_IN_RANGE) creep.moveTo(spawn);
+    }
+    else {
+      const hostile = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+      if (hostile) {
+        if (creep.attack(hostile) == ERR_NOT_IN_RANGE) creep.moveTo(hostile);
+      }
+    }
+  }
+  else {
+
+    // Game.creeps['A2'].moveToRoom('W56S12', 17, 47);
+    // Game.creeps['A2'].move(RIGHT);
+    // const hostile = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+    // if (hostile) {
+    //   if (creep.attack(hostile) == ERR_NOT_IN_RANGE) creep.moveTo(hostile);
+    //   creep.moveTo(hostile);
+    // }
+    // else {
+
+    const exit = creep.room.findExitTo(creep.memory.destRoom);
+    creep.moveTo(creep.pos.findClosestByRange(exit));
+
+    // console.log(exit)
+    // }
+  }
+}
+
+
+Creep.prototype.runLongHarvester = function () {
+  const creep = this;
+
+  if (creep.memory.task === 'harvest' && creep.carry.energy === creep.carryCapacity) creep.memory.task = 'transport';
+  else if (creep.memory.task === 'transport' && creep.carry.energy === 0) creep.memory.task = 'harvest';
+
+  if (creep.memory.task === 'harvest') creep.harvestEnergyFromDest();
+  else if (creep.memory.task === 'transport') creep.transportEnergyToHome();
+}
+
+
 Creep.prototype.runSettler = function () {
   const creep = this;
 

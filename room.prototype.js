@@ -8,6 +8,7 @@ Room.prototype.run = function () {
   }
 
 
+
   room.manageTowers();
 
   const creepsAmount = room.memory.creepAmount.creeps;
@@ -21,6 +22,11 @@ Room.prototype.run = function () {
   const transportersAmount = room.memory.creepAmount.transporter;
   const pioneersAmount = room.memory.creepAmount.pioneer;
   const settlersAmount = room.memory.creepAmount.settler;
+  const claimersAmount = room.memory.creepAmount.claimer;
+  const reserversAmount = room.memory.creepAmount.reserver;
+  const longHarvestersAmount = room.memory.creepAmount.longHarvester;
+  const attackersAmount = room.memory.creepAmount.attacker;
+  const spawnBuildersAmount = room.memory.creepAmount.spawnBuilder;
 
   const containers = room.find(FIND_STRUCTURES, { filter: structure => structure.structureType == STRUCTURE_CONTAINER });
   const towers = room.find(FIND_STRUCTURES, { filter: structure => structure.structureType == STRUCTURE_TOWER });
@@ -32,8 +38,8 @@ Room.prototype.run = function () {
 
   const isCreepNeeded = {
     1: {
-      harvester: harvestersAmount < 2,
-      pioneer: pioneersAmount < 6 * sources.length,
+      harvester: harvestersAmount < 0,
+      pioneer: pioneersAmount < 2 * sources.length,
       settler: false,
       miner: false,
       refiller: false,
@@ -42,8 +48,8 @@ Room.prototype.run = function () {
       defenseRepairer: false
     },
     2: {
-      harvester: harvestersAmount < 2,
-      pioneer: pioneersAmount < 6 * sources.length,
+      harvester: harvestersAmount < 0,
+      pioneer: pioneersAmount < 2 * sources.length,
       settler: false,
       miner: false,
       refiller: false,
@@ -52,8 +58,8 @@ Room.prototype.run = function () {
       defenseRepairer: false
     },
     3: {
-      harvester: harvestersAmount < 2,
-      pioneer: pioneersAmount < 5 * sources.length,
+      harvester: harvestersAmount < 0,
+      pioneer: pioneersAmount < 2 * sources.length,
       settler: false,
       miner: false,
       refiller: false,
@@ -63,10 +69,10 @@ Room.prototype.run = function () {
     },
     4: {
       harvester: (room.storage) ? false : harvestersAmount < 2,
-      pioneer: (room.storage) ? false : pioneersAmount < 4 * sources.length,
+      pioneer: (room.storage) ? false : pioneersAmount < 2 * sources.length,
       settler: (room.storage) ? settlersAmount < 2 : false,
       miner: minersAmount < 2,
-      refiller: refillersAmount < 2,
+      refiller: refillersAmount < 3,
       transporter: transportersAmount < minersAmount,
       repairer: false,
       defenseRepairer: defenseRepairersAmount < 1
@@ -76,14 +82,19 @@ Room.prototype.run = function () {
       pioneer: (room.storage) ? false : pioneersAmount < 4 * sources.length,
       settler: (room.storage) ? settlersAmount < 2 : false,
       miner: minersAmount < 2,
-      refiller: refillersAmount < 2,
+      refiller: refillersAmount < 3,
       transporter: transportersAmount < minersAmount,
       repairer: false,
-      defenseRepairer: defenseRepairersAmount < 1
+      defenseRepairer: defenseRepairersAmount < 1,
+      claimer: claimersAmount < 0,
+      reserver: reserversAmount < 2,
+      longHarvester: longHarvestersAmount < 5,
+      attacker: attackersAmount < 0,
+      spawnBuilder: spawnBuildersAmount < 0
     }
 
   }
-  // console.log()
+  // console.log(attackersAmount)
 
   const rolesPriority = [
     'harvester',
@@ -93,8 +104,15 @@ Room.prototype.run = function () {
     'pioneer',
     'settler',
     'repairer',
-    'defenseRepairer'
+    'defenseRepairer',
+    'spawnBuilder',
+    'claimer',
+    'reserver',
+    'longHarvester',
+    'attacker',
   ]
+
+  if (room.controller.level === 0) return;
 
   let creepToSpawn = null;
   for (let i = 0; i < rolesPriority.length; i++) {
@@ -112,6 +130,11 @@ Room.prototype.run = function () {
     case 'transporter': room.spawnTransporter(); break;
     case 'refiller': room.spawnRefiller(); break;
     case 'defenseRepairer': room.spawnDefenseRepairer(); break;
+    case 'claimer': room.spawnClaimer(); break;
+    case 'reserver': room.spawnReserver(); break;
+    case 'longHarvester': room.spawnLongHarvester(); break;
+    case 'attacker': room.spawnAttacker(); break;
+    case 'spawnBuilder': room.spawnSpawnBuilder(); break;
   }
 
   if (creepsAmount === 0 && room.energyAvailable !== room.energyCapacityAvailable) room.spawnEmergencyHarvester();
@@ -134,7 +157,12 @@ Room.prototype.updateMemory = function () {
     refiller: _.filter(creeps, creep => creep.memory.role === 'refiller').length,
     transporter: _.filter(creeps, creep => creep.memory.role === 'transporter').length,
     pioneer: _.filter(creeps, creep => creep.memory.role === 'pioneer').length,
-    settler: _.filter(creeps, creep => creep.memory.role === 'settler').length
+    settler: _.filter(creeps, creep => creep.memory.role === 'settler').length,
+    claimer: _.filter(creeps, creep => creep.memory.role === 'claimer').length,
+    reserver: _.filter(creeps, creep => creep.memory.role === 'reserver').length,
+    longHarvester: _.filter(creeps, creep => creep.memory.role === 'longHarvester').length,
+    attacker: _.filter(creeps, creep => creep.memory.role === 'attacker').length,
+    spawnBuilder: _.filter(creeps, creep => creep.memory.role === 'spawnBuilder').length,
   }
 }
 

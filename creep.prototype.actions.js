@@ -169,6 +169,84 @@ Creep.prototype.upgradeController = function () {
 
 
 
+Creep.prototype.createRoadConstruction = function () {
+  const creep = this;
+
+  creep.room.createConstructionSite(creep.pos, STRUCTURE_ROAD);
+}
+
+Creep.prototype.harvestEnergyFromDest = function () {
+  const creep = this;
+
+  if (creep.pos.roomName === creep.memory.homeRoom) {
+    const exit = creep.room.findExitTo(creep.memory.destRoom);
+    creep.moveTo(creep.pos.findClosestByRange(exit));
+  }
+  else if (creep.pos.roomName === creep.memory.destRoom) {
+    const source = (creep.memory.sourceId ? Game.getObjectById(creep.memory.sourceId) : creep.findClosestSource());
+    if (source) {
+      if (creep.harvest(source) === ERR_NOT_IN_RANGE) creep.moveTo(source);
+    }
+  }
+  else {
+    const exit = creep.room.findExitTo(creep.memory.destRoom);
+    creep.moveTo(creep.pos.findClosestByRange(exit));
+  }
+}
+
+Creep.prototype.transportEnergyToHome = function () {
+  const creep = this;
+
+  if (creep.pos.roomName === creep.memory.destRoom) {
+    creep.createRoadConstruction();
+
+    const construction = creep.findClosestConstructionSite();
+    if (construction) {
+      if (creep.build(construction) == ERR_NOT_IN_RANGE) creep.moveTo(construction)
+    }
+    else {
+      const exit = creep.room.findExitTo(creep.memory.homeRoom);
+      creep.moveTo(creep.pos.findClosestByRange(exit));
+
+      const road = creep.room.lookForAt(LOOK_STRUCTURES, creep.pos);
+      if (road) {
+        creep.name, creep.repair(road[0]);
+      }
+
+      // if (roadArray > 0) {
+      //   const road = roadArray[0]
+      //   if (road.hits < road.hitsMax) {
+      //     if (creep.repair(road) == ERR_NOT_IN_RANGE) creep.moveTo(road);
+      //   }
+      // }
+    }
+  }
+  else if (creep.pos.roomName === creep.memory.homeRoom) {
+    creep.transportEnergyToStorage();
+  }
+  else {
+    if (creep.carry.energy > 0) {
+
+
+      creep.createRoadConstruction();
+
+      const construction = creep.findClosestConstructionSite();
+      if (construction) {
+        if (creep.build(construction) == ERR_NOT_IN_RANGE) creep.moveTo(construction)
+      }
+      else {
+        const exit = creep.room.findExitTo(creep.memory.homeRoom);
+        creep.moveTo(creep.pos.findClosestByRange(exit));
+      }
+    }
+    else {
+      const exit = creep.room.findExitTo(creep.memory.destRoom);
+      creep.moveTo(creep.pos.findClosestByRange(exit));
+    }
+  }
+}
+
+
 
 
 
@@ -209,20 +287,33 @@ Creep.prototype.repairStructures = function () {
 Creep.prototype.repairDefenseStructures = function () {
   const creep = this;
 
-  const targets = creep.room.find(FIND_STRUCTURES, {
-    filter: structure => [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(structure.structureType)
-  });
-  if (targets.length === 0) { creep.moveTo(Game.flags['R']); return; }
+  // const targets = creep.room.find(FIND_STRUCTURES, {
+  //   filter: structure => [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(structure.structureType)
+  // });
+  // if (targets.length === 0) { creep.moveTo(Game.flags['R']); return; }
 
-  const tragetsHits = [...targets];
-  const hitsSummary = tragetsHits.reduce((acc, el) => acc + el.hits, 0);
-  const avegareHits = hitsSummary / targets.length;
-  // console.log(avegareHits)
+  // const tragetsHits = [...targets];
+  // const hitsSummary = tragetsHits.reduce((acc, el) => acc + el.hits, 0);
+  // const avegareHits = hitsSummary / targets.length;
+  // // console.log(avegareHits)
 
-  const target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-    filter: structure => [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(structure.structureType) && structure.hits + 3500 < avegareHits
-  });
-  // console.log(target.hits)
+  // const target = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+  //   filter: structure => [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(structure.structureType) && structure.hits < avegareHits + 1000
+  // });
+  // // console.log(target.hits)
+
+
+
+  if (creep.carry.energy === creep.carryCapacity || creep.memory.structureId === undefined) {
+    const targets = creep.room.find(FIND_STRUCTURES, {
+      filter: structure => [STRUCTURE_WALL, STRUCTURE_RAMPART].includes(structure.structureType)
+    });
+
+    targets.sort((a, b) => a.hits - b.hits);
+    creep.memory.structureId = targets[0].id;
+  }
+
+  const target = Game.getObjectById(creep.memory.structureId);
 
   if (target) {
     if (creep.repair(target) == ERR_NOT_IN_RANGE) creep.moveTo(target);

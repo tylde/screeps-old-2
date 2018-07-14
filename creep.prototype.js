@@ -17,6 +17,11 @@ Creep.prototype.run = function () {
     case 'defenseRepairer': creep.runDefenseRepairer(); break;
     case 'refiller': creep.runRefiller(); break;
     case 'transporter': creep.runTransporter(); break;
+    case 'reserver': creep.runReserver(); break;
+    case 'longHarvester': creep.runLongHarvester(); break;
+    case 'attacker': creep.runAttacker(); break;
+    case 'claimer': creep.runClaimer(); break;
+    case 'spawnBuilder': creep.runSpawnBuilder(); break;
   }
 
   // switch (creep.memory.task) {

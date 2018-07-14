@@ -19,7 +19,8 @@ module.exports.loop = () => {
     Game.rooms[roomName].run();
   }
 
-
+  // Game.creeps['A2'].moveToRoom('W56S12', 16, 17)
+  // Game.creeps['DR1'].repair(Game.getObjectById('5b48e15d4b7616345e1a4779'))
 
 };
 

@@ -67,7 +67,18 @@ Creep.prototype.findClosestSpawn = function () {
   });
 };
 
-
+Creep.prototype.findClosestTower = function () {
+  const creep = this;
+  return creep.pos.findClosestByPath(FIND_STRUCTURES, {
+    filter: structure => structure.structureType == STRUCTURE_TOWER
+  });
+};
+Creep.prototype.findClosestExtension = function () {
+  const creep = this;
+  return creep.pos.findClosestByPath(FIND_STRUCTURES, {
+    filter: structure => structure.structureType == STRUCTURE_EXTENSION
+  });
+};
 
 Creep.prototype.findConstructionSites = function () {
   const creep = this;
@@ -75,7 +86,7 @@ Creep.prototype.findConstructionSites = function () {
 };
 Creep.prototype.findClosestConstructionSite = function () {
   const creep = this;
-  return creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+  return creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES, { filter: structure => structure.my });
 };
 
 
