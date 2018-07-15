@@ -43,6 +43,7 @@ Creep.prototype.runClaimer = function () {
   }
   else {
     if (creep.claimController(creep.room.controller) == ERR_NOT_IN_RANGE) creep.moveTo(creep.room.controller);
+    // if (creep.attackController(creep.room.controller) == ERR_NOT_IN_RANGE) creep.moveTo(creep.room.controller);
   }
 }
 
@@ -224,19 +225,11 @@ Creep.prototype.runDefenseRepairer = function () {
 Creep.prototype.runTransporter = function () {
   const creep = this;
 
-  // if (creep.memory.containerId === undefined) {
-  //   const containers = creep.findContainers();
-  //   if (containers.length > 0) {
-  //     containers.sort((a, b) => a.id < b.id);
-  //     creep.memory.containerId = containers[creep.memory.number - 1].id;
-  //   }
-  // }
-
   if (creep.memory.task === 'get-energy' && creep.carry.energy === creep.carryCapacity) creep.memory.task = 'transport';
   else if (creep.memory.task === 'transport' && creep.carry.energy === 0) creep.memory.task = 'get-energy';
 
-  // if (creep.memory.task === 'get-energy') creep.withdrawEnergyFromContainer();
-  // else if (creep.memory.task === 'transport') creep.transportEnergyToStorage();
+  const energy = creep.room.lookForAt(LOOK_ENERGY, creep.pos);
+  if (energy) creep.pickup(energy[0]);
 
   if (creep.memory.task === 'get-energy') creep.getEnergyFromDest();
   else if (creep.memory.task === 'transport') creep.transportEnergyToHome();

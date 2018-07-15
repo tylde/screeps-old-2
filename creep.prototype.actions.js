@@ -30,9 +30,11 @@ Creep.prototype.pioneerRefillment = function () {
   const structure = creep.findStructureToRefill();
   if (structure) {
     if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) creep.moveTo(structure);
-
   }
-  else creep.room.memory.actualRefillPioneerId = undefined;
+  else {
+    creep.room.memory.actualRefillPioneerId = undefined;
+    if (creep.constructStructures() === ERR_NOT_FOUND) creep.upgradeController();
+  }
 }
 Creep.prototype.constructStructures = function () {
   const creep = this;
@@ -210,12 +212,21 @@ Creep.prototype.getEnergyFromDest = function () {
   //   creep.moveTo(creep.pos.findClosestByRange(exit));
   // }
 
+  // const energy = creep.room.lookForAt(LOOK_ENERGY, creep.pos);
+  // if (energy) creep.name, creep.pickup(energy[0]);
+
   if (creep.pos.roomName === creep.memory.destRoom) {
-    creep.withdrawEnergyFromContainer()
+    creep.withdrawEnergyFromContainer();
+    // const energy = creep.room.lookForAt(LOOK_ENERGY, creep.pos);
+    // // console.log(energy[0]);
+    // if (energy) creep.name, creep.pickup(energy[0]);
   }
   else {
     const exit = creep.room.findExitTo(creep.memory.destRoom);
     creep.moveTo(creep.pos.findClosestByRange(exit));
+
+    const road = creep.room.lookForAt(LOOK_STRUCTURES, creep.pos);
+    if (road) creep.name, creep.repair(road[0]);
   }
 }
 
@@ -232,7 +243,7 @@ Creep.prototype.transportEnergyToHomeLH = function () {
     creep.transportEnergyToStorage();
   }
   else {
-    // creep.createRoadConstruction();
+    creep.createRoadConstruction();
     const construction = creep.findClosestConstructionSite();
     if (construction) {
       if (creep.build(construction) == ERR_NOT_IN_RANGE) creep.moveTo(construction)
@@ -240,11 +251,6 @@ Creep.prototype.transportEnergyToHomeLH = function () {
     else {
       const exit = creep.room.findExitTo(creep.memory.homeRoom);
       creep.moveTo(creep.pos.findClosestByRange(exit));
-
-      const road = creep.room.lookForAt(LOOK_STRUCTURES, creep.pos);
-      if (road) {
-        creep.name, creep.repair(road[0]);
-      }
     }
   }
 }

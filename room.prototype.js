@@ -7,7 +7,7 @@ Room.prototype.run = function () {
   if (Game.time % 10 === 0) {
     // let start = Game.cpu.getUsed();
     room.updateMemory();
-    // console.log('CPU', Game.cpu.getUsed() - start);
+    // console.log('Room: ', room.name, '- CPU:', Game.cpu.getUsed() - start);
   }
 
 
@@ -91,7 +91,7 @@ Room.prototype.run = function () {
       repairer: false,
       defenseRepairer: defenseRepairersAmount < 1,
       claimer: claimersAmount < 0,
-      reserver: reserversAmount < 2,
+      reserver: reserversAmount < utils.getMemoryObjectPropCount(room.memory.reserverSpawnData),
       longHarvester: longHarvestersAmount < utils.getMemoryObjectPropCount(room.memory.longarvesterSpawnData),
       attacker: attackersAmount < 0,
       spawnBuilder: spawnBuildersAmount < 0

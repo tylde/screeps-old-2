@@ -7,6 +7,8 @@ const initMemory = function () {
 }
 
 module.exports.loop = () => {
+  // const startCPU = Game.cpu.getUsed();
+
   for (let name in Memory.creeps) {
     if (!Game.creeps[name]) {
       delete Memory.creeps[name];
@@ -19,5 +21,6 @@ module.exports.loop = () => {
     Game.rooms[roomName].run();
   }
 
+  // console.log('CPU used:', Game.cpu.getUsed() - startCPU, 'Bucket:', Game.cpu.bucket);
 };
 
