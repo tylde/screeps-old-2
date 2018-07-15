@@ -1,10 +1,13 @@
 require('./room.prototype.spawn');
+const utils = require('utils')
 
 Room.prototype.run = function () {
   const room = this;
 
   if (Game.time % 10 === 0) {
+    // let start = Game.cpu.getUsed();
     room.updateMemory();
+    // console.log('CPU', Game.cpu.getUsed() - start);
   }
 
 
@@ -35,6 +38,7 @@ Room.prototype.run = function () {
 
   const sources = room.find(FIND_SOURCES);
 
+  // console.log(room.memory.transporterSpawnData)
 
   const isCreepNeeded = {
     1: {
@@ -71,9 +75,9 @@ Room.prototype.run = function () {
       harvester: (room.storage) ? false : harvestersAmount < 2,
       pioneer: (room.storage) ? false : pioneersAmount < 2 * sources.length,
       settler: (room.storage) ? settlersAmount < 2 : false,
-      miner: minersAmount < 2,
+      miner: minersAmount < utils.getMemoryObjectPropCount(room.memory.minerSpawnData),
       refiller: refillersAmount < 3,
-      transporter: transportersAmount < minersAmount,
+      transporter: transportersAmount < utils.getMemoryObjectPropCount(room.memory.transporterSpawnData),
       repairer: false,
       defenseRepairer: defenseRepairersAmount < 1
     },
@@ -81,20 +85,20 @@ Room.prototype.run = function () {
       harvester: (room.storage) ? false : harvestersAmount < 2,
       pioneer: (room.storage) ? false : pioneersAmount < 4 * sources.length,
       settler: (room.storage) ? settlersAmount < 2 : false,
-      miner: minersAmount < 2,
+      miner: minersAmount < utils.getMemoryObjectPropCount(room.memory.minerSpawnData),
       refiller: refillersAmount < 3,
-      transporter: transportersAmount < minersAmount,
+      transporter: transportersAmount < utils.getMemoryObjectPropCount(room.memory.transporterSpawnData),
       repairer: false,
       defenseRepairer: defenseRepairersAmount < 1,
       claimer: claimersAmount < 0,
       reserver: reserversAmount < 2,
-      longHarvester: longHarvestersAmount < 5,
+      longHarvester: longHarvestersAmount < utils.getMemoryObjectPropCount(room.memory.longarvesterSpawnData),
       attacker: attackersAmount < 0,
       spawnBuilder: spawnBuildersAmount < 0
     }
 
   }
-  // console.log(attackersAmount)
+  // console.log(utils.getMemoryObjectPropCount(room.memory.minerSpawnData))
 
   const rolesPriority = [
     'harvester',

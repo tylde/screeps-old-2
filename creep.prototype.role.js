@@ -119,15 +119,7 @@ Creep.prototype.runAttacker = function () {
 }
 
 
-Creep.prototype.runLongHarvester = function () {
-  const creep = this;
 
-  if (creep.memory.task === 'harvest' && creep.carry.energy === creep.carryCapacity) creep.memory.task = 'transport';
-  else if (creep.memory.task === 'transport' && creep.carry.energy === 0) creep.memory.task = 'harvest';
-
-  if (creep.memory.task === 'harvest') creep.harvestEnergyFromDest();
-  else if (creep.memory.task === 'transport') creep.transportEnergyToHome();
-}
 
 
 Creep.prototype.runSettler = function () {
@@ -161,22 +153,20 @@ Creep.prototype.runHarvester = function () {
 Creep.prototype.runMiner = function () {
   const creep = this;
 
-  if (creep.memory.containerId === undefined) {
-    const containers = creep.findContainers();
-    containers.sort((a, b) => a.id < b.id);
-    creep.memory.containerId = containers[creep.memory.number - 1].id;
-  }
-
-  if (creep.memory.containerId !== undefined && creep.memory.sourceId === undefined) {
-    const container = Game.getObjectById(creep.memory.containerId)
-    const source = container.pos.findClosestByPath(FIND_SOURCES);
-    if (source) creep.memory.sourceId = source.id;
-  }
-
   const container = Game.getObjectById(creep.memory.containerId);
   const source = Game.getObjectById(creep.memory.sourceId);
-  if (creep.pos.toString() == container.pos.toString()) creep.harvest(source);
-  else creep.moveTo(container);
+
+  if (creep.pos.roomName === creep.memory.destRoom) {
+    if (creep.pos.toString() == container.pos.toString()) {
+      if (container.hits < container.hitsMax && creep.carry.energy !== 0) creep.repair(container);
+      creep.harvest(source);
+    }
+    else creep.moveTo(container);
+  }
+  else {
+    const exit = creep.room.findExitTo(creep.memory.destRoom);
+    creep.moveTo(creep.pos.findClosestByRange(exit));
+  }
 };
 
 
@@ -234,18 +224,31 @@ Creep.prototype.runDefenseRepairer = function () {
 Creep.prototype.runTransporter = function () {
   const creep = this;
 
-  if (creep.memory.containerId === undefined) {
-    const containers = creep.findContainers();
-    if (containers.length > 0) {
-      containers.sort((a, b) => a.id < b.id);
-      creep.memory.containerId = containers[creep.memory.number - 1].id;
-    }
-  }
+  // if (creep.memory.containerId === undefined) {
+  //   const containers = creep.findContainers();
+  //   if (containers.length > 0) {
+  //     containers.sort((a, b) => a.id < b.id);
+  //     creep.memory.containerId = containers[creep.memory.number - 1].id;
+  //   }
+  // }
 
   if (creep.memory.task === 'get-energy' && creep.carry.energy === creep.carryCapacity) creep.memory.task = 'transport';
   else if (creep.memory.task === 'transport' && creep.carry.energy === 0) creep.memory.task = 'get-energy';
 
-  if (creep.memory.task === 'get-energy') creep.withdrawEnergyFromContainer();
-  else if (creep.memory.task === 'transport') creep.transportEnergyToStorage();
+  // if (creep.memory.task === 'get-energy') creep.withdrawEnergyFromContainer();
+  // else if (creep.memory.task === 'transport') creep.transportEnergyToStorage();
+
+  if (creep.memory.task === 'get-energy') creep.getEnergyFromDest();
+  else if (creep.memory.task === 'transport') creep.transportEnergyToHome();
 };
 
+
+Creep.prototype.runLongHarvester = function () {
+  const creep = this;
+
+  if (creep.memory.task === 'harvest' && creep.carry.energy === creep.carryCapacity) creep.memory.task = 'transport';
+  else if (creep.memory.task === 'transport' && creep.carry.energy === 0) creep.memory.task = 'harvest';
+
+  if (creep.memory.task === 'harvest') creep.harvestEnergyFromDest();
+  else if (creep.memory.task === 'transport') creep.transportEnergyToHomeLH();
+}

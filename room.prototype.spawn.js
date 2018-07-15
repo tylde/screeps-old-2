@@ -18,7 +18,7 @@ const buildCreepBody = function (body, times) {
   return creepBody;
 }
 
-const spawnCreepFunctionGenerator = function (type, startTask, prefix, creepBodyBase, canBodyBaseIncrement, maximumIncrement) {
+const spawnCreepFunctionGenerator = function (type, startTask, prefix, creepBodyBase, maximumIncrement) {
   return function () {
     const room = this;
 
@@ -37,12 +37,32 @@ const spawnCreepFunctionGenerator = function (type, startTask, prefix, creepBody
       if (Game.creeps[creepName] === undefined) break;
     }
 
+    let bodyBase = {};
+    switch (type) {
+      case 'pioneer': bodyBase = { WORK: 1, CARRY: 1, MOVE: 1 }; break;
+      case 'harvester': bodyBase = { WORK: 1, CARRY: 1, MOVE: 1 }; break;
+      case 'longHarvester': bodyBase = { WORK: 1, CARRY: 1, MOVE: 1 }; break;
+      case 'settler': bodyBase = { WORK: 1, CARRY: 1, MOVE: 1 }; break;
+      case 'defenseRepairer': bodyBase = { WORK: 1, CARRY: 1, MOVE: 1 }; break;
+      case 'claimer': bodyBase = { CLAIM: 1, MOVE: 1 }; break;
+      case 'reserver': bodyBase = { CLAIM: 1, MOVE: 1 }; break;
+      case 'refiller': bodyBase = { CARRY: 2, MOVE: 1 }; break;
+      case 'attacker': bodyBase = { ATTACK: 1, MOVE: 1 }; break;
+      case 'spawnBuilder': bodyBase = { WORK: 1, CARRY: 1, MOVE: 1 }; break;
+      case 'miner': bodyBase = { WORK: 5, CARRY: 1, MOVE: 3 }; break;
+      case 'transporter': bodyBase = { WORK: 0, CARRY: 2, MOVE: 1 }; break;
+      case 'emergencyHarvester': bodyBase = { WORK: 1, CARRY: 1, MOVE: 2 }; break;
+    }
+
+
+
     const baseCost = getCreepBaseCost(creepBodyBase);
-    let times = canBodyBaseIncrement ? Math.floor(room.energyCapacityAvailable / baseCost) : 1;
+    let times = Math.floor(room.energyCapacityAvailable / baseCost);
     if (maximumIncrement !== null && times > maximumIncrement) times = maximumIncrement;
     const creepBody = buildCreepBody(creepBodyBase, times);
 
-    const additionalMemory = {}
+
+    let additionalMemory = {}
 
     if (type === 'reserver') {
       additionalMemory.destRoom = room.memory.reserverDest[creepNumber];
@@ -52,17 +72,18 @@ const spawnCreepFunctionGenerator = function (type, startTask, prefix, creepBody
       additionalMemory.destRoom = room.memory.claimerDest[creepNumber];
     }
 
-    if (type === 'longHarvester') {
-      additionalMemory.destRoom = room.memory.LongHarvesterDest[creepNumber];
-      additionalMemory.sourceId = room.memory.LongHarvesterSources[creepNumber];
-    }
-
     if (type === 'spawnBuilder') {
       additionalMemory.destRoom = room.memory.spawnBuilderDest[creepNumber];
     }
 
     if (type === 'attacker') {
       additionalMemory.destRoom = 'W57S12';
+    }
+
+    switch (type) {
+      case 'miner': { additionalMemory = { ...room.memory.minerSpawnData[creepNumber] }; break; }
+      case 'transporter': { additionalMemory = { ...room.memory.transporterSpawnData[creepNumber] }; break; }
+      case 'longHarvester': { additionalMemory = { ...room.memory.longarvesterSpawnData[creepNumber] }; break; }
     }
 
     const spawnResult = spawn.spawnCreep(creepBody, creepName, {
@@ -75,6 +96,7 @@ const spawnCreepFunctionGenerator = function (type, startTask, prefix, creepBody
       }
     });
 
+    // cosole.log(spawnResult)
     if (spawnResult === OK) { console.log('Create new creep:', creepName); }
   }
 }
@@ -84,7 +106,7 @@ const harvesterBodyBase = { WORK: 1, CARRY: 1, MOVE: 1 };
 const emergencyHarvesterBodyBase = { WORK: 1, CARRY: 1, MOVE: 2 };
 
 const settlerBodyBase = { WORK: 1, CARRY: 1, MOVE: 1 };
-const minerBodyBase = { WORK: 5, CARRY: 0, MOVE: 3 };
+const minerBodyBase = { WORK: 5, CARRY: 1, MOVE: 3 };
 const transporterBodyBase = { WORK: 0, CARRY: 2, MOVE: 1 };
 
 const refillerBodyBase = { WORK: 0, CARRY: 2, MOVE: 1 };
@@ -101,24 +123,24 @@ const spawnBuilderBase = { WORK: 1, CARRY: 1, MOVE: 1 };
 
 
 
-Room.prototype.spawnPioneer = spawnCreepFunctionGenerator('pioneer', 'harvest', 'P', pionerBodyBase, true, 4);
-Room.prototype.spawnHarvester = spawnCreepFunctionGenerator('harvester', 'harvest', 'H', harvesterBodyBase, true, 4);
-Room.prototype.spawnEmergencyHarvester = spawnCreepFunctionGenerator('harvester', 'harvest', 'H', emergencyHarvesterBodyBase, false, null);
+Room.prototype.spawnPioneer = spawnCreepFunctionGenerator('pioneer', 'harvest', 'P', pionerBodyBase, 4);
+Room.prototype.spawnHarvester = spawnCreepFunctionGenerator('harvester', 'harvest', 'H', harvesterBodyBase, 4);
+Room.prototype.spawnEmergencyHarvester = spawnCreepFunctionGenerator('harvester', 'harvest', 'H', emergencyHarvesterBodyBase, 1);
 
-Room.prototype.spawnSettler = spawnCreepFunctionGenerator('settler', 'get-energy', 'S', settlerBodyBase, true, 6);
-Room.prototype.spawnMiner = spawnCreepFunctionGenerator('miner', 'mine', 'M', minerBodyBase, false, null);
-Room.prototype.spawnTransporter = spawnCreepFunctionGenerator('transporter', 'get-energy', 'T', transporterBodyBase, true, 6);
+Room.prototype.spawnSettler = spawnCreepFunctionGenerator('settler', 'get-energy', 'S', settlerBodyBase, 6);
+Room.prototype.spawnMiner = spawnCreepFunctionGenerator('miner', 'mine', 'M', minerBodyBase, 1);
+Room.prototype.spawnTransporter = spawnCreepFunctionGenerator('transporter', 'get-energy', 'T', transporterBodyBase, 6);
 
-Room.prototype.spawnRefiller = spawnCreepFunctionGenerator('refiller', 'get-energy', 'RF', refillerBodyBase, true, 2);
-Room.prototype.spawnDefenseRepairer = spawnCreepFunctionGenerator('defenseRepairer', 'get-energy', 'DR', defenseRepairerBodyBase, true, 4);
+Room.prototype.spawnRefiller = spawnCreepFunctionGenerator('refiller', 'get-energy', 'RF', refillerBodyBase, 2);
+Room.prototype.spawnDefenseRepairer = spawnCreepFunctionGenerator('defenseRepairer', 'get-energy', 'DR', defenseRepairerBodyBase, 4);
 
-Room.prototype.spawnReserver = spawnCreepFunctionGenerator('reserver', 'reserve', 'RS', reserversBodyBase, false, null);
-Room.prototype.spawnClaimer = spawnCreepFunctionGenerator('claimer', 'claim', 'C', claimersBodyBase, true, 2);
+Room.prototype.spawnReserver = spawnCreepFunctionGenerator('reserver', 'reserve', 'RS', reserversBodyBase, 1);
+Room.prototype.spawnClaimer = spawnCreepFunctionGenerator('claimer', 'claim', 'C', claimersBodyBase, 2);
 
-Room.prototype.spawnLongHarvester = spawnCreepFunctionGenerator('longHarvester', 'harvest', 'LH', longHarvestersBodyBase, true, 5);
+Room.prototype.spawnLongHarvester = spawnCreepFunctionGenerator('longHarvester', 'harvest', 'LH', longHarvestersBodyBase, 5);
 
-Room.prototype.spawnAttacker = spawnCreepFunctionGenerator('attacker', 'attack', 'A', attackerBodyBase, true, 4);
+Room.prototype.spawnAttacker = spawnCreepFunctionGenerator('attacker', 'attack', 'A', attackerBodyBase, 4);
 
-Room.prototype.spawnSpawnBuilder = spawnCreepFunctionGenerator('spawnBuilder', 'harvest', 'SB', spawnBuilderBase, true, 4);
+Room.prototype.spawnSpawnBuilder = spawnCreepFunctionGenerator('spawnBuilder', 'harvest', 'SB', spawnBuilderBase, 4);
 
 
