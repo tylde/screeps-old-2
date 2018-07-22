@@ -22,6 +22,8 @@ Creep.prototype.run = function () {
     case 'attacker': creep.runAttacker(); break;
     case 'claimer': creep.runClaimer(); break;
     case 'spawnBuilder': creep.runSpawnBuilder(); break;
+    case 'extractor': creep.runExtractor(); break;
+    case 'mineralTransporter': creep.runMineralTransporter(); break;
   }
 
   // switch (creep.memory.task) {

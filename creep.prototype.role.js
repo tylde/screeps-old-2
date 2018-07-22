@@ -158,9 +158,10 @@ Creep.prototype.runMiner = function () {
   const source = Game.getObjectById(creep.memory.sourceId);
 
   if (creep.pos.roomName === creep.memory.destRoom) {
+    if (!container) return;
     if (creep.pos.toString() == container.pos.toString()) {
       if (container.hits < container.hitsMax && creep.carry.energy !== 0) creep.repair(container);
-      creep.harvest(source);
+      if (_.sum(container.store) < container.storeCapacity) creep.harvest(source);
     }
     else creep.moveTo(container);
   }
@@ -168,6 +169,41 @@ Creep.prototype.runMiner = function () {
     const exit = creep.room.findExitTo(creep.memory.destRoom);
     creep.moveTo(creep.pos.findClosestByRange(exit));
   }
+};
+
+
+
+Creep.prototype.runExtractor = function () {
+  const creep = this;
+
+  const container = Game.getObjectById(creep.memory.containerId);
+  const source = Game.getObjectById(creep.memory.sourceId);
+
+  if (creep.pos.roomName === creep.memory.destRoom) {
+    if (!container) return;
+    if (creep.pos.toString() == container.pos.toString()) {
+      if (container.hits < container.hitsMax && creep.carry.energy !== 0) creep.repair(container);
+      if (_.sum(container.store) < container.storeCapacity) creep.harvest(source);
+    }
+    else creep.moveTo(container);
+  }
+  else {
+    const exit = creep.room.findExitTo(creep.memory.destRoom);
+    creep.moveTo(creep.pos.findClosestByRange(exit));
+  }
+};
+
+Creep.prototype.runMineralTransporter = function () {
+  const creep = this;
+
+  if (creep.memory.task === 'get-mineral' && _.sum(creep.carry) === creep.carryCapacity) creep.memory.task = 'transport';
+  else if (creep.memory.task === 'transport' && _.sum(creep.carry) === 0) creep.memory.task = 'get-mineral';
+
+  const mineral = creep.room.lookForAt(LOOK_MINERALS, creep.pos);
+  if (mineral) creep.pickup(mineral[0]);
+
+  if (creep.memory.task === 'get-mineral') creep.withdrawMineralFromContainer();
+  else if (creep.memory.task === 'transport') creep.transportMineralToTerminal();
 };
 
 
@@ -184,7 +220,7 @@ Creep.prototype.runRefiller = function () {
   }
   else {
     if (creep.memory.task === 'get-energy') creep.moveTo(Game.flags[creep.name]);
-    else if (creep.memory.task === 'refill') creep.transportEnergyToStorage();
+    else if (creep.memory.task === 'refill') creep.transportResourceToStorage();
   }
 };
 
@@ -232,7 +268,7 @@ Creep.prototype.runTransporter = function () {
   if (energy) creep.pickup(energy[0]);
 
   if (creep.memory.task === 'get-energy') creep.getEnergyFromDest();
-  else if (creep.memory.task === 'transport') creep.transportEnergyToHome();
+  else if (creep.memory.task === 'transport') creep.transportResourceToHome();
 };
 
 

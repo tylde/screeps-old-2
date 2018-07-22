@@ -136,7 +136,7 @@ Creep.prototype.withdrawEnergyFromContainer = function () {
 
 
 
-Creep.prototype.transportEnergyToStorage = function () {
+Creep.prototype.transportResourceToStorage = function () {
   const creep = this;
 
   const storage = creep.room.storage;
@@ -144,6 +144,43 @@ Creep.prototype.transportEnergyToStorage = function () {
 };
 
 
+
+Creep.prototype.withdrawMineralFromContainer = function () {
+  const creep = this;
+
+  let container = null;
+  if (creep.memory.containerId !== undefined) container = Game.getObjectById(creep.memory.containerId);
+  else return;
+  const minerals = [
+    RESOURCE_HYDROGEN,
+    RESOURCE_OXYGEN,
+    RESOURCE_UTRIUM,
+    RESOURCE_LEMERGIUM,
+    RESOURCE_KEANIUM,
+    RESOURCE_ZYNTHIUM,
+    RESOURCE_CATALYST,
+    RESOURCE_GHODIUM
+  ];
+
+  minerals.forEach((mineral) => {
+    if (container.store[mineral] > 0) {
+      if (creep.withdraw(container, mineral) === ERR_NOT_IN_RANGE) creep.moveTo(container);
+    }
+  });
+};
+
+
+Creep.prototype.transportMineralToTerminal = function () {
+  const creep = this;
+
+  const terminal = creep.room.terminal;
+
+  for (let resource in creep.carry) {
+    if (creep.carry[resource] > 0) {
+      if (creep.transfer(terminal, resource) == ERR_NOT_IN_RANGE) creep.moveTo(terminal);
+    }
+  }
+};
 
 
 Creep.prototype.transportEnergyToSpawn = function () {
@@ -240,7 +277,7 @@ Creep.prototype.transportEnergyToHomeLH = function () {
   const creep = this;
 
   if (creep.pos.roomName === creep.memory.homeRoom) {
-    creep.transportEnergyToStorage();
+    creep.transportResourceToStorage();
   }
   else {
     creep.createRoadConstruction();
@@ -254,11 +291,11 @@ Creep.prototype.transportEnergyToHomeLH = function () {
     }
   }
 }
-Creep.prototype.transportEnergyToHome = function () {
+Creep.prototype.transportResourceToHome = function () {
   const creep = this;
 
   if (creep.pos.roomName === creep.memory.homeRoom) {
-    creep.transportEnergyToStorage();
+    creep.transportResourceToStorage();
   }
   else {
     const exit = creep.room.findExitTo(creep.memory.homeRoom);
@@ -269,6 +306,20 @@ Creep.prototype.transportEnergyToHome = function () {
   }
 }
 
+Creep.prototype.transportMineralToHome = function () {
+  const creep = this;
+
+  if (creep.pos.roomName === creep.memory.homeRoom) {
+    creep.transportMineralToStorage();
+  }
+  else {
+    const exit = creep.room.findExitTo(creep.memory.homeRoom);
+    creep.moveTo(creep.pos.findClosestByRange(exit));
+
+    const road = creep.room.lookForAt(LOOK_STRUCTURES, creep.pos);
+    if (road) creep.name, creep.repair(road[0]);
+  }
+}
 
 
 // =====================================================================
