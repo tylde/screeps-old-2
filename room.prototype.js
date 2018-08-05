@@ -125,6 +125,40 @@ Room.prototype.run = function () {
       spawnBuilder: spawnBuildersAmount < 0,
       extractor: extractorsAmount < utils.getMemoryObjectPropCount(room.memory.extractorSpawnData),
       mineralTransporter: mineralTransportersAmount < extractorsAmount
+    },
+    7: {
+      harvester: (room.storage) ? false : harvestersAmount < 0,
+      pioneer: (room.storage) ? false : pioneersAmount < 2 * sources.length,
+      settler: (room.storage) ? settlersAmount < 2 : false,
+      transporter: transportersAmount < utils.getMemoryObjectPropCount(room.memory.transporterSpawnData),
+      refiller: (room.storage) ? refillersAmount < 3 : false,
+      miner: minersAmount < utils.getMemoryObjectPropCount(room.memory.minerSpawnData),
+      repairer: false,
+      defenseRepairer: defenseRepairersAmount < 1 && defenseStructures.length > 0,
+      claimer: claimersAmount < 0,
+      reserver: reserversAmount < utils.getMemoryObjectPropCount(room.memory.reserverSpawnData),
+      longHarvester: longHarvestersAmount < utils.getMemoryObjectPropCount(room.memory.longarvesterSpawnData),
+      attacker: attackersAmount < 0,
+      spawnBuilder: spawnBuildersAmount < 0,
+      extractor: extractorsAmount < utils.getMemoryObjectPropCount(room.memory.extractorSpawnData),
+      mineralTransporter: mineralTransportersAmount < extractorsAmount
+    },
+    8: {
+      harvester: (room.storage) ? false : harvestersAmount < 0,
+      pioneer: (room.storage) ? false : pioneersAmount < 2 * sources.length,
+      settler: (room.storage) ? settlersAmount < 2 : false,
+      transporter: transportersAmount < utils.getMemoryObjectPropCount(room.memory.transporterSpawnData),
+      refiller: (room.storage) ? refillersAmount < 3 : false,
+      miner: minersAmount < utils.getMemoryObjectPropCount(room.memory.minerSpawnData),
+      repairer: false,
+      defenseRepairer: defenseRepairersAmount < 1 && defenseStructures.length > 0,
+      claimer: claimersAmount < 0,
+      reserver: reserversAmount < utils.getMemoryObjectPropCount(room.memory.reserverSpawnData),
+      longHarvester: longHarvestersAmount < utils.getMemoryObjectPropCount(room.memory.longarvesterSpawnData),
+      attacker: attackersAmount < 0,
+      spawnBuilder: spawnBuildersAmount < 0,
+      extractor: extractorsAmount < utils.getMemoryObjectPropCount(room.memory.extractorSpawnData),
+      mineralTransporter: mineralTransportersAmount < extractorsAmount
     }
 
   }

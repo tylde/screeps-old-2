@@ -22,11 +22,13 @@ Game.rooms['W58S13'].memory.reserverSpawnData = {
   2: { destRoom: 'W58S12' },
   3: { destRoom: 'W59S13' },
   4: { destRoom: 'W59S13' },
+  5: { destRoom: 'W57S12' },
+  6: { destRoom: 'W57S12' },
 }
 
 Game.rooms['W58S13'].memory.longarvesterSpawnData = {
-  // 1: { destRoom: 'W58S12', sourceId: '59f19f5b82100e1594f34d35' },
-  // 2: { destRoom: 'W59S12', sourceId: '59f19f4c82100e1594f34bac' },
+  1: { destRoom: 'W57S12', sourceId: '59f19f7382100e1594f34ec5' },
+  2: { destRoom: 'W57S12', sourceId: '59f19f7382100e1594f34ec6' },
   // 3: { destRoom: 'W57S12', sourceId: '59f19f7382100e1594f34ec6' },
 }
 
@@ -64,11 +66,15 @@ Game.rooms['W58S13'].memory.mineralTransporterSpawnData = {
 }
 
 
+// =================================================================================================
+
+
 Game.rooms['W58S11'].memory.minerSpawnData = {
   1: { destRoom: 'W58S11', containerId: '5b533d73a583d01884937f23', sourceId: '59f19f5a82100e1594f34d32' },
   2: { destRoom: 'W58S11', containerId: '5b534414cf241912d37660d1', sourceId: '59f19f5a82100e1594f34d30' },
   3: { destRoom: 'W59S11', containerId: '5b545cdf2ea6591057aabff4', sourceId: '59f19f4c82100e1594f34ba7' },
   4: { destRoom: 'W57S11', containerId: '5b545bb47c7d694d6b2b3831', sourceId: '59f19f7382100e1594f34ec1' },
+  5: { destRoom: 'W59S11', containerId: '5b54a66ca106aa12c70eb947', sourceId: '59f19f4c82100e1594f34ba9' },
 }
 
 Game.rooms['W58S11'].memory.transporterSpawnData = {
@@ -76,10 +82,18 @@ Game.rooms['W58S11'].memory.transporterSpawnData = {
   2: { destRoom: 'W58S11', containerId: '5b534414cf241912d37660d1' }, // M2
   3: { destRoom: 'W59S11', containerId: '5b545cdf2ea6591057aabff4' },
   4: { destRoom: 'W57S11', containerId: '5b545bb47c7d694d6b2b3831' },
+  5: { destRoom: 'W59S11', containerId: '5b54a66ca106aa12c70eb947' },
 }
 
 Game.rooms['W58S11'].memory.longarvesterSpawnData = {
   // 1: { destRoom: 'W57S11', sourceId: '59f19f7382100e1594f34ec1' },
   // 2: { destRoom: 'W59S11', sourceId: '59f19f4c82100e1594f34ba7' },
-  1: { destRoom: 'W59S11', sourceId: '59f19f4c82100e1594f34ba9' }
+  // 1: { destRoom: 'W59S11', sourceId: '59f19f4c82100e1594f34ba9' }
+}
+
+Game.rooms['W58S11'].memory.reserverSpawnData = {
+  1: { destRoom: 'W59S11' },
+  2: { destRoom: 'W59S11' },
+  3: { destRoom: 'W57S11' },
+  4: { destRoom: 'W57S11' },
 }
